@@ -8,8 +8,6 @@ import { TeletextHUD } from './components/TeletextHUD';
 import { TeletextRemote } from './components/TeletextRemote';
 import { TeletextScreen } from './components/TeletextScreen';
 
-const CHANNELS = ['100', '201', '301', '401', '999'];
-
 export const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<string>('100');
   const [subpage, setSubpage] = useState<number>(1);
@@ -100,13 +98,6 @@ export const App: React.FC = () => {
     },
     [fetchPage],
   );
-
-  // cycle channel on tv physical rotary knob
-  const handleChannelKnob = useCallback(() => {
-    const currentIndex = CHANNELS.indexOf(currentPage);
-    const nextIndex = (currentIndex + 1) % CHANNELS.length;
-    navigateTo(CHANNELS[nextIndex]);
-  }, [currentPage, navigateTo]);
 
   // handle digit keypad input
   const handleDigit = useCallback(
@@ -204,7 +195,7 @@ export const App: React.FC = () => {
       />
 
       <main className="teletext-workspace">
-        {/* vintage 1980s color crt tv set */}
+        {/* vintage 1980s color crt tv set (larger, centered display) */}
         <TeletextScreen
           frame={frame}
           rollingCode={rollingCode}
@@ -212,7 +203,6 @@ export const App: React.FC = () => {
           scanlines={scanlines}
           glow={glow}
           convex={convex}
-          onChannelKnobClick={handleChannelKnob}
         />
 
         {/* authentic handheld infrared remote */}

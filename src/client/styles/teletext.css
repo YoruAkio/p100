@@ -365,21 +365,21 @@ body {
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9), 0 1px 1px rgba(255, 255, 255, 0.08);
 }
 
-/* front layout containing screen and right-hand control strip */
+/* front layout containing screen */
 .tv-main-front {
   display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 /* deeply recessed crt screen bezel */
 .crt-screen-bezel {
   background: #111318;
-  border-radius: 24px;
-  padding: 14px;
-  box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.95),
-    inset 0 0 2px rgba(255, 255, 255, 0.1),
+  border-radius: 28px;
+  padding: 16px 18px 12px 18px;
+  box-shadow: inset 0 6px 20px rgba(0, 0, 0, 0.95),
+    inset 0 0 3px rgba(255, 255, 255, 0.1),
     0 1px 2px rgba(255, 255, 255, 0.08);
   border: 2px solid #232733;
   display: flex;
@@ -388,9 +388,9 @@ body {
 }
 
 .crt-screen-trim {
-  border-radius: 20px;
+  border-radius: 22px;
   background: #000000;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.95);
+  box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.95);
   overflow: hidden;
   position: relative;
 }
@@ -408,12 +408,12 @@ body {
 
 /* active 3d spherical convex bulb geometry */
 .crt-glass-tube.convex-active {
-  border-radius: 44px / 32px;
-  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.95),
-    inset 0 0 110px rgba(0, 0, 0, 0.85),
-    inset 0 3px 6px rgba(255, 255, 255, 0.22),
-    0 0 25px rgba(0, 0, 0, 0.9);
-  transform: perspective(700px) scale(0.985);
+  border-radius: 52px / 38px;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.95),
+    inset 0 0 130px rgba(0, 0, 0, 0.85),
+    inset 0 4px 8px rgba(255, 255, 255, 0.25),
+    0 0 30px rgba(0, 0, 0, 0.9);
+  transform: perspective(750px) scale(0.985);
 }
 
 .crt-glass-tube.flat-active {
@@ -497,15 +497,15 @@ body {
   text-shadow: 0 0 1px currentColor, 0 0 4px currentColor;
 }
 
-/* 40x24 teletext grid viewport */
+/* 40x24 teletext grid viewport - enhanced large screen format */
 .teletext-grid {
   display: grid;
-  grid-template-rows: repeat(24, 1.4em);
+  grid-template-rows: repeat(24, 1.45em);
   width: 41ch;
   background: #000000;
-  padding: 12px 18px;
-  font-size: 20px;
-  line-height: 1.4em;
+  padding: 16px 22px;
+  font-size: 24px;
+  line-height: 1.45em;
   font-family: var(--font-teletext);
   font-weight: bold;
   letter-spacing: 0.04em;
@@ -521,7 +521,7 @@ body {
   white-space: pre;
   display: flex;
   overflow: hidden;
-  height: 1.4em;
+  height: 1.45em;
 }
 
 .tt-span {
@@ -576,207 +576,40 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 8px;
-  font-size: 0.65rem;
+  padding: 10px 14px 2px 14px;
+  font-size: 0.72rem;
   font-weight: bold;
-  color: #5d667a;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
 }
 
-/* ==========================================================================
-   4. TELEVISION RIGHT-HAND TACTILE CONTROL PANEL
-   ========================================================================== */
-
-.tv-control-panel {
-  background: linear-gradient(180deg, #22252e 0%, #15171e 100%);
-  border: 2px solid #323746;
-  border-radius: 16px;
-  padding: 16px 14px;
-  width: 110px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.08), 0 4px 10px rgba(0, 0, 0, 0.6);
-}
-
-.tv-brand-plate {
-  text-align: center;
-  border-bottom: 1px solid #363c4c;
-  padding-bottom: 8px;
-  width: 100%;
-}
-
-.brand-logo {
-  font-size: 0.85rem;
-  font-weight: 900;
-  letter-spacing: 3px;
-  color: var(--gold-accent);
-  text-shadow: 0 0 6px rgba(196, 154, 69, 0.3);
-}
-
-.brand-sub {
-  font-size: 0.55rem;
-  color: #727b8e;
-  letter-spacing: 1px;
-}
-
-/* rotary channel selector */
-.tv-knob-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.tv-knob-title {
-  font-size: 0.6rem;
-  font-weight: bold;
-  color: #8c97ad;
-  letter-spacing: 1px;
-}
-
-.tv-rotary-dial {
-  position: relative;
-  width: 64px;
-  height: 64px;
-  background: radial-gradient(circle, #3d4352 30%, #1b1e26 90%);
-  border: 3px solid #586074;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8),
-    inset 0 2px 3px rgba(255, 255, 255, 0.25);
+.bezel-left {
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: transform 0.1s ease;
+  gap: 8px;
 }
 
-.tv-rotary-dial:active {
-  transform: rotate(25deg);
-}
-
-.rotary-notch {
-  width: 4px;
-  height: 20px;
-  background: var(--gold-accent);
-  border-radius: 2px;
-  box-shadow: 0 0 4px rgba(196, 154, 69, 0.6);
-}
-
-.dial-numbers {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  font-size: 0.65rem;
-  font-weight: bold;
-  color: #a4afc5;
-}
-
-.d-100 { position: absolute; top: 2px; left: 26px; }
-.d-201 { position: absolute; top: 18px; right: 4px; }
-.d-301 { position: absolute; bottom: 8px; right: 12px; }
-.d-401 { position: absolute; bottom: 8px; left: 12px; }
-.d-999 { position: absolute; top: 18px; left: 4px; }
-
-/* small analog potentiometers */
-.tv-knob-row {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  gap: 6px;
-}
-
-.tv-small-knob {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-}
-
-.tv-sub-title {
-  font-size: 0.55rem;
-  color: #798397;
-  font-weight: bold;
-}
-
-.small-dial {
-  width: 28px;
-  height: 28px;
-  background: radial-gradient(circle, #3e4454 20%, #16181f 90%);
-  border: 2px solid #4a5266;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
-  position: relative;
-}
-
-.small-dial::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 12px;
-  width: 2px;
-  height: 8px;
-  background: #ffffff;
-  border-radius: 1px;
-}
-
-.small-dial.tuned::after {
-  transform: rotate(40deg);
-}
-
-/* master power section & red glowing pilot lamp */
-.tv-power-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.tv-pilot-lamp {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #2a0808;
-  border: 2px solid #471111;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tv-pilot-lamp.on .lamp-bulb {
+.bezel-power-led {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #ff2a2a;
-  box-shadow: 0 0 10px #ff2a2a, 0 0 18px #ff0000;
+  background: #ff2222;
+  box-shadow: 0 0 8px #ff2222, 0 0 14px #ff0000;
+  display: inline-block;
 }
 
-.tv-power-label {
-  font-size: 0.58rem;
-  font-weight: bold;
-  color: #a02020;
-  letter-spacing: 1px;
+.model-badge {
+  color: var(--gold-accent);
+  font-weight: 900;
+  letter-spacing: 2px;
 }
 
-/* speaker acoustic louvers */
-.tv-speaker-grille {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  width: 100%;
-  padding: 4px 0;
-}
-
-.speaker-slot {
-  height: 3px;
-  background: #0d0e12;
-  border-radius: 1px;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.95), 0 1px 0 rgba(255, 255, 255, 0.06);
+.carrier-badge {
+  color: #69748b;
+  font-size: 0.65rem;
 }
 
 /* ==========================================================================
-   5. AUTHENTIC 1980S INFRARED REMOTE COMMANDER
+   4. AUTHENTIC 1980S INFRARED REMOTE COMMANDER
    ========================================================================== */
 
 .vintage-remote-commander {
@@ -1026,13 +859,5 @@ body {
   }
   .crt-tv-chassis {
     padding: 12px;
-  }
-  .tv-main-front {
-    flex-direction: column;
-  }
-  .tv-control-panel {
-    width: 100%;
-    flex-direction: row;
-    padding: 8px 12px;
   }
 }

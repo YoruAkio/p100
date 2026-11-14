@@ -11,7 +11,6 @@ interface TeletextScreenProps {
   scanlines: boolean;
   glow: boolean;
   convex: boolean;
-  onChannelKnobClick: () => void;
 }
 
 export const TeletextScreen: React.FC<TeletextScreenProps> = ({
@@ -21,7 +20,6 @@ export const TeletextScreen: React.FC<TeletextScreenProps> = ({
   scanlines,
   glow,
   convex,
-  onChannelKnobClick,
 }) => {
   // render individual teletext row
   const renderRow = (rowSpans: TeletextSpan[], rowIndex: number) => {
@@ -75,8 +73,10 @@ export const TeletextScreen: React.FC<TeletextScreenProps> = ({
       <div className="tv-antenna-left" aria-hidden="true" />
       <div className="tv-antenna-right" aria-hidden="true" />
 
-      {/* top ventilation slats */}
+      {/* top heat ventilation slats */}
       <div className="tv-top-ventilation">
+        <span />
+        <span />
         <span />
         <span />
         <span />
@@ -115,71 +115,17 @@ export const TeletextScreen: React.FC<TeletextScreenProps> = ({
             </div>
           </div>
 
+          {/* authentic television bottom bezel branding & pilot led */}
           <div className="bezel-bottom-label">
-            <span className="model-badge">P100 COLOR MONITOR</span>
-            <span className="carrier-badge">4.5MHz WST DECODER</span>
+            <div className="bezel-left">
+              <span className="bezel-power-led" title="Power Carrier Locked" />
+              <span className="model-badge">KIRO CRISIS TV-84</span>
+            </div>
+            <div className="bezel-right">
+              <span className="carrier-badge">P100 COLOR MONITOR &bull; 4.5MHz WST</span>
+            </div>
           </div>
         </div>
-
-        {/* television right-hand tactile control panel */}
-        <aside className="tv-control-panel">
-          {/* brand plate */}
-          <div className="tv-brand-plate">
-            <div className="brand-logo">KIRO</div>
-            <div className="brand-sub">CRISIS TV-84</div>
-          </div>
-
-          {/* rotary channel selector dial */}
-          <div className="tv-knob-group">
-            <span className="tv-knob-title">CHANNEL</span>
-            <button
-              className="tv-rotary-dial"
-              onClick={onChannelKnobClick}
-              title="Click to Click Through Channels (P100 -> P201 -> P301 -> P401 -> P999)"
-            >
-              <div className="rotary-notch" />
-              <div className="dial-numbers">
-                <span className="d-100">1</span>
-                <span className="d-201">2</span>
-                <span className="d-301">3</span>
-                <span className="d-401">4</span>
-                <span className="d-999">9</span>
-              </div>
-            </button>
-          </div>
-
-          {/* volume & tuning analog pots */}
-          <div className="tv-knob-row">
-            <div className="tv-small-knob">
-              <span className="tv-sub-title">VOL</span>
-              <div className="small-dial" />
-            </div>
-            <div className="tv-small-knob">
-              <span className="tv-sub-title">TUNE</span>
-              <div className="small-dial tuned" />
-            </div>
-          </div>
-
-          {/* power switch and pilot lamp */}
-          <div className="tv-power-section">
-            <div className="tv-pilot-lamp on" title="Power / Receiver Carrier Locked">
-              <span className="lamp-bulb" />
-            </div>
-            <span className="tv-power-label">POWER</span>
-          </div>
-
-          {/* acoustic speaker grille */}
-          <div className="tv-speaker-grille">
-            <span className="speaker-slot" />
-            <span className="speaker-slot" />
-            <span className="speaker-slot" />
-            <span className="speaker-slot" />
-            <span className="speaker-slot" />
-            <span className="speaker-slot" />
-            <span className="speaker-slot" />
-            <span className="speaker-slot" />
-          </div>
-        </aside>
       </div>
     </div>
   );
