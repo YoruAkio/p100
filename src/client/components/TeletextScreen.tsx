@@ -13,39 +13,6 @@ interface TeletextScreenProps {
   convex: boolean;
 }
 
-interface TeletextCell {
-  char: string;
-  fg: string;
-  bg: string;
-  double?: boolean;
-}
-
-// unpack compressed teletext spans into an exact 40-character grid row
-function expandRowToCells(rowSpans: TeletextSpan[]): TeletextCell[] {
-  const cells: TeletextCell[] = [];
-  for (const span of rowSpans) {
-    const chars = Array.from(span.t);
-    for (const ch of chars) {
-      if (cells.length >= 40) break;
-      cells.push({
-        char: ch,
-        fg: `fg-${span.c || 'white'}`,
-        bg: `bg-${span.b || 'black'}`,
-        double: span.d,
-      });
-    }
-    if (cells.length >= 40) break;
-  }
-  while (cells.length < 40) {
-    cells.push({
-      char: ' ',
-      fg: 'fg-white',
-      bg: 'bg-black',
-    });
-  }
-  return cells;
-}
-
 export const TeletextScreen: React.FC<TeletextScreenProps> = ({
   frame,
   rollingCode,
@@ -54,41 +21,50 @@ export const TeletextScreen: React.FC<TeletextScreenProps> = ({
   glow,
   convex,
 }) => {
-  // render individual teletext row with 40 equal-width columns
+  // render individual teletext row with normal 40-character span flow
   const renderRow = (rowSpans: TeletextSpan[], rowIndex: number) => {
-    const cells = expandRowToCells(rowSpans);
+    const charCount = rowSpans.reduce((sum, s) => sum + s.t.length, 0);
+    const padding = charCount < 40 ? ' '.repeat(40 - charCount) : '';
 
     return (
       <div key={rowIndex} className="tt-row">
-        {cells.map((cell, cellIdx) => (
-          <span
-            key={cellIdx}
-            className={`tt-cell ${cell.fg} ${cell.bg} ${cell.double ? 'double' : ''}`}
-          >
-            {cell.char}
-          </span>
-        ))}
+        {rowSpans.map((span, spanIdx) => {
+          const fgClass = `fg-${span.c || 'white'}`;
+          const bgClass = `bg-${span.b || 'black'}`;
+          const dClass = span.d ? 'double' : '';
+          return (
+            <span
+              key={spanIdx}
+              className={`tt-span ${fgClass} ${bgClass} ${dClass}`}
+            >
+              {span.t}
+            </span>
+          );
+        })}
+        {padding && (
+          <span className="tt-span fg-white bg-black">{padding}</span>
+        )}
       </div>
     );
   };
 
   // build header row when rolling page hunt is active or regular
   const renderHeader = () => {
+    const firstRow = frame.rows[0] || [];
     if (!rollingCode) {
-      return renderRow(frame.rows[0] || [], 0);
+      return renderRow(firstRow, 0);
     }
 
     const displayPage = `P${rollingCode.padEnd(4, ' ')}`;
-    const tuningText = ' P100 TUNING BROADCAST... '.padEnd(27, ' ');
-    const searchTag = 'SEARCH  ';
-
-    const headerSpans: TeletextSpan[] = [
-      { t: displayPage, c: 'yellow', b: 'blue', d: true },
-      { t: tuningText, c: 'white', b: 'blue' },
-      { t: searchTag, c: 'yellow', b: 'blue' },
-    ];
-
-    return renderRow(headerSpans, 0);
+    return (
+      <div key={0} className="tt-row">
+        <span className="tt-span fg-yellow bg-blue double">{displayPage}</span>
+        <span className="tt-span fg-white bg-blue">
+          {' P100 TUNING BROADCAST... '.padEnd(27, ' ')}
+        </span>
+        <span className="tt-span fg-yellow bg-blue">{'SEARCH  '}</span>
+      </div>
+    );
   };
 
   return (
@@ -99,8 +75,6 @@ export const TeletextScreen: React.FC<TeletextScreenProps> = ({
 
       {/* top heat ventilation slats */}
       <div className="tv-top-ventilation">
-        <span />
-        <span />
         <span />
         <span />
         <span />
@@ -123,7 +97,7 @@ export const TeletextScreen: React.FC<TeletextScreenProps> = ({
               {convex && <div className="crt-glass-glare" />}
               <div className="crt-vignette" />
 
-              {/* 40x24 teletext grid spanning full screen width */}
+              {/* 40x24 teletext grid in standard 40ch native viewport */}
               <div
                 className={`teletext-grid ${glow ? 'crt-glow' : ''} ${
                   convex ? 'grid-curved' : ''
