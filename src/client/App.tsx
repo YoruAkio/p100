@@ -179,49 +179,52 @@ export const App: React.FC = () => {
 
   return (
     <div className="p100-app">
-      {/* retro broadcast telemetry rack HUD */}
-      <TeletextHUD
-        bytes={frame.bytes || 1200}
-        latencyMs={latencyMs}
-        source={frame.source}
-        slow2G={slow2G}
-        onToggleSlow2G={setSlow2G}
-        scanlines={scanlines}
-        onToggleScanlines={setScanlines}
-        glow={glow}
-        onToggleGlow={setGlow}
-        convex={convex}
-        onToggleConvex={setConvex}
-      />
+      <div className="teletext-main-layout">
+        {/* tv broadcast column (screen width equals header width) */}
+        <div className="tv-broadcast-column">
+          <TeletextHUD
+            bytes={frame.bytes || 1200}
+            latencyMs={latencyMs}
+            source={frame.source}
+            slow2G={slow2G}
+            onToggleSlow2G={setSlow2G}
+            scanlines={scanlines}
+            onToggleScanlines={setScanlines}
+            glow={glow}
+            onToggleGlow={setGlow}
+            convex={convex}
+            onToggleConvex={setConvex}
+          />
 
-      <main className="teletext-workspace">
-        {/* vintage 1980s color crt tv set (larger, centered display) */}
-        <TeletextScreen
-          frame={frame}
-          rollingCode={rollingCode}
-          onNavigate={navigateTo}
-          scanlines={scanlines}
-          glow={glow}
-          convex={convex}
-        />
+          <TeletextScreen
+            frame={frame}
+            rollingCode={rollingCode}
+            onNavigate={navigateTo}
+            scanlines={scanlines}
+            glow={glow}
+            convex={convex}
+          />
+        </div>
 
-        {/* authentic handheld infrared remote */}
-        <TeletextRemote
-          inputBuffer={inputBuffer}
-          currentPage={currentPage}
-          subpage={subpage}
-          totalSubpages={frame.totalSubpages}
-          fastext={frame.fastext}
-          onDigitPress={handleDigit}
-          onClear={() => {
-            triggerIrFlash();
-            setInputBuffer('');
-          }}
-          onSubpageChange={handleSubpageChange}
-          onNavigate={navigateTo}
-          irBlink={irBlink}
-        />
-      </main>
+        {/* remote input column on the right */}
+        <div className="remote-column">
+          <TeletextRemote
+            inputBuffer={inputBuffer}
+            currentPage={currentPage}
+            subpage={subpage}
+            totalSubpages={frame.totalSubpages}
+            fastext={frame.fastext}
+            onDigitPress={handleDigit}
+            onClear={() => {
+              triggerIrFlash();
+              setInputBuffer('');
+            }}
+            onSubpageChange={handleSubpageChange}
+            onNavigate={navigateTo}
+            irBlink={irBlink}
+          />
+        </div>
+      </div>
 
       <footer className="p100-guide">
         <p>

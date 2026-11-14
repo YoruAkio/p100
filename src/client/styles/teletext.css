@@ -43,11 +43,37 @@ body {
 
 .p100-app {
   width: 100%;
-  max-width: 1240px;
+  max-width: 1360px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.2rem 0.75rem 2rem 0.75rem;
+  padding: 1.2rem 1rem 2rem 1rem;
+}
+
+/* main horizontal layout: tv column on left, remote input column on right */
+.teletext-main-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+}
+
+/* tv broadcast column (screen width equals header width) */
+.tv-broadcast-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1040px;
+}
+
+/* remote input column on the right */
+.remote-column {
+  position: sticky;
+  top: 1.2rem;
+  flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -62,7 +88,7 @@ body {
   border: 2px solid #373c4a;
   border-radius: 6px;
   padding: 0.9rem 1.6rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.1rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -296,24 +322,16 @@ body {
 }
 
 /* ==========================================================================
-   2. TELETEXT WORKSPACE & RETRO 1980S COLOR CRT TV SET
+   2. COLOR CRT TELEVISION SET (WIDTH MATCHES HEADER)
    ========================================================================== */
 
-.teletext-workspace {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 2.2rem;
-  width: 100%;
-}
-
-/* main tv set cabinet */
 .crt-tv-chassis {
   position: relative;
+  width: 100%;
+  max-width: 1040px;
   background: linear-gradient(180deg, #2b2e38 0%, #181920 100%);
   border-radius: 28px;
-  padding: 24px 24px 28px 24px;
+  padding: 20px 24px 22px 24px;
   border: 3px solid #3d4251;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9),
     inset 0 3px 6px rgba(255, 255, 255, 0.12),
@@ -323,11 +341,11 @@ body {
   align-items: center;
 }
 
-/* dual rabbit-ear antenna tips protruding in background */
+/* dual rabbit-ear antenna tips in background */
 .tv-antenna-left {
   position: absolute;
   top: -38px;
-  left: 90px;
+  left: 120px;
   width: 6px;
   height: 48px;
   background: linear-gradient(90deg, #959fad 0%, #58606e 100%);
@@ -340,7 +358,7 @@ body {
 .tv-antenna-right {
   position: absolute;
   top: -38px;
-  left: 140px;
+  left: 170px;
   width: 6px;
   height: 48px;
   background: linear-gradient(90deg, #959fad 0%, #58606e 100%);
@@ -354,7 +372,7 @@ body {
 .tv-top-ventilation {
   display: flex;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .tv-top-ventilation span {
@@ -375,9 +393,10 @@ body {
 
 /* deeply recessed crt screen bezel */
 .crt-screen-bezel {
+  width: 100%;
   background: #111318;
-  border-radius: 28px;
-  padding: 16px 18px 12px 18px;
+  border-radius: 24px;
+  padding: 14px 18px 10px 18px;
   box-shadow: inset 0 6px 20px rgba(0, 0, 0, 0.95),
     inset 0 0 3px rgba(255, 255, 255, 0.1),
     0 1px 2px rgba(255, 255, 255, 0.08);
@@ -388,7 +407,8 @@ body {
 }
 
 .crt-screen-trim {
-  border-radius: 22px;
+  width: 100%;
+  border-radius: 20px;
   background: #000000;
   box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.95);
   overflow: hidden;
@@ -401,6 +421,7 @@ body {
 
 .crt-glass-tube {
   position: relative;
+  width: 100%;
   background: #000000;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -408,7 +429,7 @@ body {
 
 /* active 3d spherical convex bulb geometry */
 .crt-glass-tube.convex-active {
-  border-radius: 52px / 38px;
+  border-radius: 46px / 32px;
   box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.95),
     inset 0 0 130px rgba(0, 0, 0, 0.85),
     inset 0 4px 8px rgba(255, 255, 255, 0.25),
@@ -497,18 +518,17 @@ body {
   text-shadow: 0 0 1px currentColor, 0 0 4px currentColor;
 }
 
-/* 40x24 teletext grid viewport - enhanced large screen format */
+/* 40x24 teletext grid viewport - reverted compact height, full header width */
 .teletext-grid {
   display: grid;
-  grid-template-rows: repeat(24, 1.45em);
-  width: 41ch;
+  grid-template-rows: repeat(24, 1.25em);
+  width: 100%;
   background: #000000;
-  padding: 16px 22px;
-  font-size: 24px;
-  line-height: 1.45em;
+  padding: 12px 28px;
+  font-size: 19px;
+  line-height: 1.25em;
   font-family: var(--font-teletext);
   font-weight: bold;
-  letter-spacing: 0.04em;
   position: relative;
   z-index: 10;
 }
@@ -521,7 +541,9 @@ body {
   white-space: pre;
   display: flex;
   overflow: hidden;
-  height: 1.45em;
+  height: 1.25em;
+  width: 100%;
+  letter-spacing: clamp(1px, 0.35vw, 4px);
 }
 
 .tt-span {
@@ -609,14 +631,14 @@ body {
 }
 
 /* ==========================================================================
-   4. AUTHENTIC 1980S INFRARED REMOTE COMMANDER
+   4. AUTHENTIC 1980S INFRARED REMOTE COMMANDER (INPUT ON RIGHT)
    ========================================================================== */
 
 .vintage-remote-commander {
   background: linear-gradient(180deg, #242732 0%, #15171e 100%);
   border: 3px solid #373c4d;
   border-radius: 20px;
-  padding: 18px 16px;
+  padding: 16px 14px;
   width: 220px;
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85),
     inset 0 2px 4px rgba(255, 255, 255, 0.12),
@@ -817,8 +839,8 @@ body {
 }
 
 /* ==========================================================================
-   6. FOOTER GUIDE & RESPONSIVENESS
-   ========================================================================== */
+   5. FOOTER GUIDE & RESPONSIVENESS
+   ========================================================================= */
 
 .p100-guide {
   margin-top: 2rem;
@@ -838,10 +860,13 @@ body {
   font-weight: bold;
 }
 
-@media (max-width: 1024px) {
-  .teletext-workspace {
+@media (max-width: 1200px) {
+  .teletext-main-layout {
     flex-direction: column;
     align-items: center;
+  }
+  .remote-column {
+    position: static;
   }
 }
 
@@ -853,11 +878,10 @@ body {
     flex-wrap: wrap;
   }
   .teletext-grid {
-    font-size: 13px;
-    padding: 8px;
-    width: 40ch;
+    font-size: 12px;
+    padding: 6px 10px;
   }
   .crt-tv-chassis {
-    padding: 12px;
+    padding: 12px 10px;
   }
 }
