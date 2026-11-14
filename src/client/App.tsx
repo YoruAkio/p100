@@ -4,9 +4,38 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { generatePage404 } from '../teletext/page404';
 import { TeletextFrameResponse } from '../teletext/types';
 import { getIndexPage } from '../server/services/indexPage';
+import { getEarthquakePage } from '../server/services/earthquake';
+import { getWeatherPage } from '../server/services/weather';
+import { getTransitPage } from '../server/services/transit';
+import { getEmergencyPage } from '../server/services/emergency';
+import { getDiagnosticsPage } from '../server/services/diagnostics';
 import { TeletextHUD } from './components/TeletextHUD';
 import { TeletextRemote } from './components/TeletextRemote';
 import { TeletextScreen } from './components/TeletextScreen';
+
+// local deterministic page resolver for offline, preview, and zero-fail resilience
+export async function resolvePageLocal(
+  code: string,
+  sub: number,
+): Promise<TeletextFrameResponse> {
+  switch (code) {
+    case '100':
+      return getIndexPage();
+    case '201':
+      if (sub === 2) {
+        return await getWeatherPage();
+      }
+      return await getEarthquakePage();
+    case '301':
+      return getTransitPage();
+    case '401':
+      return getEmergencyPage();
+    case '999':
+      return getDiagnosticsPage();
+    default:
+      return generatePage404(code);
+  }
+}
 
 export const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<string>('100');
@@ -33,7 +62,7 @@ export const App: React.FC = () => {
     }, 150);
   }, []);
 
-  // fetch page from edge api
+  // fetch page from edge api with instant local fallback
   const fetchPage = useCallback(
     async (code: string, sub: number) => {
       triggerIrFlash();
@@ -55,7 +84,20 @@ export const App: React.FC = () => {
           await new Promise((resolve) => setTimeout(resolve, 2500));
         }
 
-        const res = await fetch(`/api/page/${code}?subpage=${sub}`);
+        let data: TeletextFrameResponse | null = null;
+        try {
+          const res = await fetch(`/api/page/${code}?subpage=${sub}`);
+          if (res.ok) {
+            data = (await res.json()) as TeletextFrameResponse;
+          }
+        } catch {
+          // edge api unavailable or offline, use deterministic local fallback
+        }
+
+        if (!data) {
+          data = await resolvePageLocal(code, sub);
+        }
+
         const elapsed = Math.round(performance.now() - startTime);
         setLatencyMs(elapsed);
 
@@ -65,17 +107,9 @@ export const App: React.FC = () => {
         }
         setRollingCode(null);
 
-        if (res.ok) {
-          const data = (await res.json()) as TeletextFrameResponse;
-          setFrame(data);
-          setCurrentPage(code);
-          setSubpage(data.subpage);
-        } else {
-          const errData = (await res.json()) as TeletextFrameResponse;
-          setFrame(errData);
-          setCurrentPage(code);
-          setSubpage(1);
-        }
+        setFrame(data);
+        setCurrentPage(code);
+        setSubpage(data.subpage);
       } catch {
         if (rollTimerRef.current) {
           clearInterval(rollTimerRef.current);

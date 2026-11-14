@@ -66,7 +66,7 @@ body {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 1040px;
+  max-width: 980px;
 }
 
 /* remote input column on the right */
@@ -74,6 +74,7 @@ body {
   position: sticky;
   top: 1.2rem;
   flex-shrink: 0;
+  width: 240px;
 }
 
 /* ==========================================================================
@@ -83,7 +84,7 @@ body {
 .retro-rack-hud {
   position: relative;
   width: 100%;
-  max-width: 1040px;
+  max-width: 980px;
   background: linear-gradient(180deg, #262933 0%, #171920 100%);
   border: 2px solid #373c4a;
   border-radius: 6px;
@@ -328,7 +329,7 @@ body {
 .crt-tv-chassis {
   position: relative;
   width: 100%;
-  max-width: 1040px;
+  max-width: 980px;
   background: linear-gradient(180deg, #2b2e38 0%, #181920 100%);
   border-radius: 28px;
   padding: 20px 24px 22px 24px;
@@ -518,15 +519,14 @@ body {
   text-shadow: 0 0 1px currentColor, 0 0 4px currentColor;
 }
 
-/* 40x24 teletext grid viewport - reverted compact height, full header width */
+/* 40x24 teletext grid viewport - compact height, full header width */
 .teletext-grid {
   display: grid;
-  grid-template-rows: repeat(24, 1.25em);
+  grid-template-rows: repeat(24, 1.28em);
   width: 100%;
   background: #000000;
-  padding: 12px 28px;
-  font-size: 19px;
-  line-height: 1.25em;
+  padding: 10px 14px;
+  line-height: 1.28em;
   font-family: var(--font-teletext);
   font-weight: bold;
   position: relative;
@@ -538,23 +538,31 @@ body {
 }
 
 .tt-row {
-  white-space: pre;
-  display: flex;
-  overflow: hidden;
-  height: 1.25em;
+  display: grid;
+  grid-template-columns: repeat(40, 1fr);
   width: 100%;
-  letter-spacing: clamp(1px, 0.35vw, 4px);
+  height: 1.28em;
+  line-height: 1.28em;
+  overflow: hidden;
+  white-space: pre;
 }
 
-.tt-span {
-  display: inline-block;
+.tt-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   height: 100%;
+  font-family: var(--font-teletext);
+  font-weight: bold;
+  font-size: clamp(12px, 1.35vw, 17px);
+  user-select: none;
+  text-align: center;
 }
 
-.tt-span.double {
-  transform-origin: top left;
+.tt-cell.double {
+  font-size: clamp(14px, 1.65vw, 21px);
   font-weight: 900;
-  letter-spacing: 0.06em;
 }
 
 /* 8 classic teletext colors */
@@ -576,17 +584,30 @@ body {
 .bg-cyan { background-color: var(--tt-cyan); }
 .bg-white { background-color: var(--tt-white); }
 
+.fastext-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 100%;
+  height: 1.28em;
+  overflow: hidden;
+}
+
 .fastext-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-teletext);
+  font-size: clamp(11px, 1.2vw, 15px);
+  font-weight: bold;
+  letter-spacing: clamp(1px, 0.2vw, 2px);
   cursor: pointer;
   border: none;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  font-weight: bold;
-  text-align: left;
-  padding: 0;
   outline: none;
+  white-space: pre;
   transition: filter 0.08s;
+  padding: 0;
 }
 
 .fastext-button:hover {
@@ -860,7 +881,7 @@ body {
   font-weight: bold;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 990px) {
   .teletext-main-layout {
     flex-direction: column;
     align-items: center;

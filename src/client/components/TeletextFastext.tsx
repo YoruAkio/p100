@@ -20,14 +20,13 @@ export const TeletextFastext: React.FC<TeletextFastextProps> = ({
   ];
 
   return (
-    <div className="tt-row">
+    <div className="tt-row fastext-row">
       {items.map(({ item, fg, bg, key }, idx) => {
         const text = `${item.code} ${item.label}`.slice(0, 10).padEnd(10, ' ');
         return (
           <button
             key={idx}
-            className={`tt-span fastext-button ${fg} ${bg}`}
-            style={{ width: '10ch', display: 'inline-block' }}
+            className={`fastext-button ${fg} ${bg}`}
             onClick={() => onNavigate(item.code)}
             title={`Jump to P${item.code} (Shortcut: ${key})`}
           >
