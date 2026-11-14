@@ -1,4 +1,4 @@
-// hud telemetry bar component
+// retro broadcast telemetry rack-mount unit component
 
 import React from 'react';
 
@@ -12,6 +12,8 @@ interface TeletextHUDProps {
   onToggleScanlines: (enabled: boolean) => void;
   glow: boolean;
   onToggleGlow: (enabled: boolean) => void;
+  convex: boolean;
+  onToggleConvex: (enabled: boolean) => void;
 }
 
 export const TeletextHUD: React.FC<TeletextHUDProps> = ({
@@ -24,55 +26,114 @@ export const TeletextHUD: React.FC<TeletextHUDProps> = ({
   onToggleScanlines,
   glow,
   onToggleGlow,
+  convex,
+  onToggleConvex,
 }) => {
   const isBudgetOk = bytes < 2048;
 
   return (
-    <header className="p100-hud">
-      <div className="hud-left">
-        <span className="hud-brand">P100 TELETEXT</span>
-        <span
-          className={`hud-badge ${isBudgetOk ? 'green' : 'red'}`}
-          title="Strict payload ceiling under 2,048 bytes"
-        >
-          PAYLOAD: {bytes} BYTES {isBudgetOk ? '(< 2KB)' : '(EXCEEDED)'}
-        </span>
-        <span className="hud-badge yellow">
-          LATENCY: {latencyMs}MS
-        </span>
-        <span
-          className={`hud-badge ${
-            source === 'live' ? 'green' : source === 'cache' ? 'yellow' : 'red'
-          }`}
-        >
-          {source.toUpperCase()}
-        </span>
+    <header className="retro-rack-hud">
+      {/* corner mounting screw accents */}
+      <span className="rack-screw top-left" aria-hidden="true" />
+      <span className="rack-screw top-right" aria-hidden="true" />
+      <span className="rack-screw bottom-left" aria-hidden="true" />
+      <span className="rack-screw bottom-right" aria-hidden="true" />
+
+      {/* unit identifier */}
+      <div className="rack-section rack-id">
+        <div className="rack-model">DEMOD-84 VBI RECEIVER</div>
+        <div className="rack-title">KIRO-WST BROADCAST MONITOR</div>
       </div>
 
-      <div className="hud-right">
-        <label className="hud-toggle-label">
+      {/* digital telemetry readouts */}
+      <div className="rack-section rack-meters">
+        {/* payload meter */}
+        <div className="led-readout-panel">
+          <span className="led-label">BYTE BUDGET (&lt;2048B)</span>
+          <div className={`led-display ${isBudgetOk ? 'led-green' : 'led-red'}`}>
+            <span className="led-digits">{String(bytes).padStart(4, '0')} B</span>
+            <span className="led-status-dot" />
+          </div>
+        </div>
+
+        {/* latency meter */}
+        <div className="led-readout-panel">
+          <span className="led-label">CARRIER LATENCY</span>
+          <div className="led-display led-amber">
+            <span className="led-digits">{String(latencyMs).padStart(4, ' ')} MS</span>
+          </div>
+        </div>
+
+        {/* signal source / status */}
+        <div className="led-readout-panel">
+          <span className="led-label">TRANSMITTER</span>
+          <div
+            className={`led-display ${
+              source === 'live' ? 'led-green' : source === 'cache' ? 'led-amber' : 'led-red'
+            }`}
+          >
+            <span className="led-digits">{source.toUpperCase()}</span>
+          </div>
+        </div>
+
+        {/* vbi carrier vu meter */}
+        <div className="vu-meter-panel">
+          <span className="led-label">RF VBI SIGNAL</span>
+          <div className="vu-bar-graph" title="RF Carrier Signal Lock">
+            <span className="vu-seg on" />
+            <span className="vu-seg on" />
+            <span className="vu-seg on" />
+            <span className="vu-seg on" />
+            <span className="vu-seg on" />
+            <span className="vu-seg on" />
+            <span className="vu-seg on" />
+            <span className="vu-seg on" />
+            <span className={`vu-seg ${source === 'live' ? 'on yellow' : ''}`} />
+            <span className={`vu-seg ${source === 'live' ? 'on red' : ''}`} />
+          </div>
+        </div>
+      </div>
+
+      {/* hardware toggle switches */}
+      <div className="rack-section rack-toggles">
+        <label className="toggle-switch-wrapper" title="Simulate Slow-2G / 2,500ms Edge Latency">
           <input
             type="checkbox"
             checked={slow2G}
             onChange={(e) => onToggleSlow2G(e.target.checked)}
           />
-          SLOW-2G SIM (2500MS)
+          <span className="toggle-switch-lever" />
+          <span className="toggle-switch-label">SLOW-2G</span>
         </label>
-        <label className="hud-toggle-label">
+
+        <label className="toggle-switch-wrapper" title="Toggle Raster Scanlines">
           <input
             type="checkbox"
             checked={scanlines}
             onChange={(e) => onToggleScanlines(e.target.checked)}
           />
-          SCANLINES
+          <span className="toggle-switch-lever" />
+          <span className="toggle-switch-label">SCANLINES</span>
         </label>
-        <label className="hud-toggle-label">
+
+        <label className="toggle-switch-wrapper" title="Toggle Phosphor Bloom & Glow">
           <input
             type="checkbox"
             checked={glow}
             onChange={(e) => onToggleGlow(e.target.checked)}
           />
-          PHOSPHOR GLOW
+          <span className="toggle-switch-lever" />
+          <span className="toggle-switch-label">GLOW</span>
+        </label>
+
+        <label className="toggle-switch-wrapper" title="Toggle 3D Convex CRT Bulb Curvature">
+          <input
+            type="checkbox"
+            checked={convex}
+            onChange={(e) => onToggleConvex(e.target.checked)}
+          />
+          <span className="toggle-switch-lever" />
+          <span className="toggle-switch-label">CONVEX TV</span>
         </label>
       </div>
     </header>

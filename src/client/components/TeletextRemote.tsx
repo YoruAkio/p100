@@ -1,4 +1,4 @@
-// tactile retro tv remote control numpad component
+// tactile retro 1980s infrared remote commander component
 
 import React from 'react';
 import { FastextNav } from '../../teletext/types';
@@ -13,6 +13,7 @@ interface TeletextRemoteProps {
   onClear: () => void;
   onSubpageChange: (direction: 'prev' | 'next') => void;
   onNavigate: (code: string) => void;
+  irBlink: boolean;
 }
 
 export const TeletextRemote: React.FC<TeletextRemoteProps> = ({
@@ -25,97 +26,122 @@ export const TeletextRemote: React.FC<TeletextRemoteProps> = ({
   onClear,
   onSubpageChange,
   onNavigate,
+  irBlink,
 }) => {
-  // format 3-digit buffer display
   const displayBuffer = inputBuffer
     ? `P${inputBuffer.padEnd(3, '_')}`
     : `P${currentPage}`;
 
   return (
-    <aside className="remote-chassis">
-      <div className="remote-header">REMOTE CONTROLLER</div>
-
-      {/* page code digital display */}
-      <div className="remote-input-display">{displayBuffer}</div>
-
-      {/* fastext color buttons */}
-      <div className="remote-fastext-grid">
-        <button
-          className="remote-btn btn-red"
-          onClick={() => onNavigate(fastext.red.code)}
-          title={`Jump to P${fastext.red.code}`}
-        >
-          RED
-        </button>
-        <button
-          className="remote-btn btn-green"
-          onClick={() => onNavigate(fastext.green.code)}
-          title={`Jump to P${fastext.green.code}`}
-        >
-          GREEN
-        </button>
-        <button
-          className="remote-btn btn-yellow"
-          onClick={() => onNavigate(fastext.yellow.code)}
-          title={`Jump to P${fastext.yellow.code}`}
-        >
-          YELLOW
-        </button>
-        <button
-          className="remote-btn btn-cyan"
-          onClick={() => onNavigate(fastext.cyan.code)}
-          title={`Jump to P${fastext.cyan.code}`}
-        >
-          CYAN
-        </button>
+    <aside className="vintage-remote-commander">
+      {/* infrared diode window at top */}
+      <div className="remote-ir-head">
+        <span className={`remote-ir-emitter ${irBlink ? 'ir-transmitting' : ''}`} />
+        <span className="remote-brand-tag">INFRARED RC-84</span>
       </div>
 
-      {/* subpage navigation */}
-      <div className="remote-subpage-controls">
-        <button
-          className="subpage-btn"
-          onClick={() => onSubpageChange('prev')}
-          title="Previous Subpage (Arrow Left)"
-        >
-          &lt; PREV
-        </button>
-        <button
-          className="subpage-btn"
-          onClick={() => onSubpageChange('next')}
-          title="Next Subpage (Arrow Right)"
-        >
-          NEXT &gt;
-        </button>
-      </div>
+      <div className="remote-inner-body">
+        {/* vintage segmented lcd page readout */}
+        <div className="remote-lcd-window">
+          <div className="lcd-header">PAGE MEMORY</div>
+          <div className="lcd-digits">{displayBuffer}</div>
+          <div className="lcd-sub-info">
+            SUB {subpage}/{totalSubpages}
+          </div>
+        </div>
 
-      {/* 3x4 numpad */}
-      <div className="remote-numpad">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+        {/* fastext rubber dome buttons */}
+        <div className="remote-section-title">FASTEXT DIRECT ACCESS</div>
+        <div className="remote-fastext-grid">
           <button
-            key={num}
-            className="numpad-btn"
-            onClick={() => onDigitPress(String(num))}
+            className="remote-rubber-btn fastext-red"
+            onClick={() => onNavigate(fastext.red.code)}
+            title={`Red Fastext: P${fastext.red.code} (${fastext.red.label})`}
           >
-            {num}
+            <span className="key-tag">R</span>
+            <span className="key-code">{fastext.red.code}</span>
           </button>
-        ))}
-        <button className="numpad-btn" onClick={onClear} title="Clear Input Buffer">
-          CLR
-        </button>
-        <button className="numpad-btn" onClick={() => onDigitPress('0')}>
-          0
-        </button>
-        <button
-          className="numpad-btn"
-          onClick={() => onNavigate('100')}
-          title="Master Index"
-        >
-          IDX
-        </button>
-      </div>
+          <button
+            className="remote-rubber-btn fastext-green"
+            onClick={() => onNavigate(fastext.green.code)}
+            title={`Green Fastext: P${fastext.green.code} (${fastext.green.label})`}
+          >
+            <span className="key-tag">G</span>
+            <span className="key-code">{fastext.green.code}</span>
+          </button>
+          <button
+            className="remote-rubber-btn fastext-yellow"
+            onClick={() => onNavigate(fastext.yellow.code)}
+            title={`Yellow Fastext: P${fastext.yellow.code} (${fastext.yellow.label})`}
+          >
+            <span className="key-tag">Y</span>
+            <span className="key-code">{fastext.yellow.code}</span>
+          </button>
+          <button
+            className="remote-rubber-btn fastext-cyan"
+            onClick={() => onNavigate(fastext.cyan.code)}
+            title={`Cyan Fastext: P${fastext.cyan.code} (${fastext.cyan.label})`}
+          >
+            <span className="key-tag">C</span>
+            <span className="key-code">{fastext.cyan.code}</span>
+          </button>
+        </div>
 
-      <div style={{ textAlign: 'center', fontSize: '0.7rem', color: '#718096' }}>
-        PAGE {subpage} OF {totalSubpages}
+        {/* subpage carousel rocker */}
+        <div className="remote-subpage-rocker">
+          <button
+            className="rocker-btn"
+            onClick={() => onSubpageChange('prev')}
+            title="Previous Subpage (Arrow Left)"
+          >
+            &lt; SUBPAGE
+          </button>
+          <button
+            className="rocker-btn"
+            onClick={() => onSubpageChange('next')}
+            title="Next Subpage (Arrow Right)"
+          >
+            SUBPAGE &gt;
+          </button>
+        </div>
+
+        {/* numeric keypad */}
+        <div className="remote-section-title">DIRECT NUMERIC DIAL</div>
+        <div className="remote-numpad-matrix">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+            <button
+              key={num}
+              className="numpad-key"
+              onClick={() => onDigitPress(String(num))}
+            >
+              {num}
+            </button>
+          ))}
+          <button
+            className="numpad-key key-clear"
+            onClick={onClear}
+            title="Clear Digits"
+          >
+            CLR
+          </button>
+          <button
+            className="numpad-key"
+            onClick={() => onDigitPress('0')}
+          >
+            0
+          </button>
+          <button
+            className="numpad-key key-idx"
+            onClick={() => onNavigate('100')}
+            title="Master Index P100"
+          >
+            IDX
+          </button>
+        </div>
+
+        <div className="remote-bottom-badge">
+          <span>KIRO TELETEXT SYSTEM</span>
+        </div>
       </div>
     </aside>
   );

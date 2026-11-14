@@ -1,4 +1,4 @@
-/* authentic 1980s teletext crt and terminal styling */
+/* authentic 1980s color crt television and broadcast telemetry styling */
 
 :root {
   --tt-black: #000000;
@@ -10,8 +10,15 @@
   --tt-cyan: #00ffff;
   --tt-white: #ffffff;
 
+  --chassis-bg: #1e2027;
+  --chassis-dark: #14161b;
+  --chassis-trim: #2d313d;
+  --chassis-highlight: #3e4454;
+  --gold-accent: #c49a45;
+  --vfd-green: #39ff14;
+  --vfd-amber: #ffaa00;
+
   --font-teletext: 'Courier New', Courier, 'Lucida Console', 'Liberation Mono', monospace;
-  --crt-curvature: 8px;
 }
 
 * {
@@ -21,7 +28,8 @@
 }
 
 body {
-  background-color: #0b0c10;
+  background-color: #08090c;
+  background-image: radial-gradient(circle at 50% 20%, #151821 0%, #07080b 80%);
   color: var(--tt-white);
   font-family: var(--font-teletext);
   min-height: 100vh;
@@ -33,154 +41,440 @@ body {
   user-select: none;
 }
 
-/* app layout */
 .p100-app {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1240px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem 0.5rem;
+  padding: 1.2rem 0.75rem 2rem 0.75rem;
 }
 
-/* hud header */
-.p100-hud {
+/* ==========================================================================
+   1. RETRO BROADCAST TELEMETRY RACK HUD (INDUSTRIAL 1980S RACK-MOUNT)
+   ========================================================================== */
+
+.retro-rack-hud {
+  position: relative;
   width: 100%;
-  max-width: 980px;
-  background: #151821;
-  border: 1px solid #2d3748;
-  border-radius: 4px;
-  padding: 0.6rem 1rem;
-  margin-bottom: 0.75rem;
+  max-width: 1040px;
+  background: linear-gradient(180deg, #262933 0%, #171920 100%);
+  border: 2px solid #373c4a;
+  border-radius: 6px;
+  padding: 0.9rem 1.6rem;
+  margin-bottom: 1.25rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  font-size: 0.85rem;
-  text-transform: uppercase;
+  gap: 1rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.8);
 }
 
-.hud-left {
+/* realistic countersunk philips screw caps */
+.rack-screw {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, #555c6e 30%, #20242e 90%);
+  border-radius: 50%;
+  border: 1px solid #111318;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.rack-screw::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 2px;
+  width: 6px;
+  height: 1.5px;
+  background: #111318;
+  transform: rotate(45deg);
+}
+
+.rack-screw::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 2px;
+  width: 6px;
+  height: 1.5px;
+  background: #111318;
+  transform: rotate(-45deg);
+}
+
+.rack-screw.top-left { top: 6px; left: 8px; }
+.rack-screw.top-right { top: 6px; right: 8px; }
+.rack-screw.bottom-left { bottom: 6px; left: 8px; }
+.rack-screw.bottom-right { bottom: 6px; right: 8px; }
+
+.rack-section {
   display: flex;
   align-items: center;
-  gap: 1rem;
 }
 
-.hud-brand {
-  font-weight: bold;
-  color: var(--tt-yellow);
+.rack-id {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  border-right: 1px solid #333845;
+  padding-right: 1.2rem;
+}
+
+.rack-model {
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: var(--gold-accent);
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(196, 154, 69, 0.4);
+}
+
+.rack-title {
+  font-size: 0.65rem;
+  color: #798299;
   letter-spacing: 1px;
 }
 
-.hud-badge {
-  display: inline-flex;
+/* digital led readouts */
+.rack-meters {
+  display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: 3px;
+  gap: 1.2rem;
+}
+
+.led-readout-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.led-label {
+  font-size: 0.62rem;
   font-weight: bold;
+  color: #8c96ac;
+  letter-spacing: 1px;
 }
 
-.hud-badge.green {
-  background: rgba(0, 255, 0, 0.15);
-  color: var(--tt-green);
-  border: 1px solid var(--tt-green);
-}
-
-.hud-badge.yellow {
-  background: rgba(255, 255, 0, 0.15);
-  color: var(--tt-yellow);
-  border: 1px solid var(--tt-yellow);
-}
-
-.hud-badge.red {
-  background: rgba(255, 0, 0, 0.15);
-  color: var(--tt-red);
-  border: 1px solid var(--tt-red);
-}
-
-.hud-right {
+.led-display {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 6px;
+  background: #0d0f14;
+  border: 1px solid #232733;
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-family: var(--font-teletext);
+  font-weight: bold;
+  font-size: 0.82rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
 }
 
-.hud-toggle-label {
+.led-display.led-green {
+  color: var(--vfd-green);
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.7);
+}
+
+.led-display.led-amber {
+  color: var(--vfd-amber);
+  text-shadow: 0 0 8px rgba(255, 170, 0, 0.7);
+}
+
+.led-display.led-red {
+  color: #ff3333;
+  text-shadow: 0 0 8px rgba(255, 51, 51, 0.8);
+}
+
+.led-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* rf signal vu bar graph */
+.vu-meter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vu-bar-graph {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
-  color: #a0aec0;
-  cursor: pointer;
+  gap: 2px;
+  background: #0d0f14;
+  border: 1px solid #232733;
+  border-radius: 3px;
+  padding: 4px 6px;
 }
 
-.hud-toggle-label input {
-  cursor: pointer;
+.vu-seg {
+  width: 4px;
+  height: 12px;
+  background: #1c212c;
+  border-radius: 1px;
 }
 
-/* main terminal workspace */
+.vu-seg.on {
+  background: #00ff66;
+  box-shadow: 0 0 5px rgba(0, 255, 102, 0.6);
+}
+
+.vu-seg.on.yellow {
+  background: #ffcc00;
+  box-shadow: 0 0 5px rgba(255, 204, 0, 0.6);
+}
+
+.vu-seg.on.red {
+  background: #ff3333;
+  box-shadow: 0 0 5px rgba(255, 51, 51, 0.8);
+}
+
+/* vintage mechanical toggle switches */
+.rack-toggles {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+
+.toggle-switch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-switch-wrapper input {
+  display: none;
+}
+
+.toggle-switch-lever {
+  position: relative;
+  width: 32px;
+  height: 16px;
+  background: #111317;
+  border: 1px solid #3c4252;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+  transition: background 0.15s ease;
+}
+
+.toggle-switch-lever::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(180deg, #bfc7d5 0%, #616a7d 100%);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  transition: transform 0.15s ease;
+}
+
+.toggle-switch-wrapper input:checked + .toggle-switch-lever {
+  background: #1a3322;
+  border-color: #27ae60;
+}
+
+.toggle-switch-wrapper input:checked + .toggle-switch-lever::after {
+  transform: translateX(15px);
+  background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%);
+  box-shadow: 0 0 6px rgba(46, 204, 113, 0.7);
+}
+
+.toggle-switch-label {
+  font-size: 0.68rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #9aa4b8;
+}
+
+/* ==========================================================================
+   2. TELETEXT WORKSPACE & RETRO 1980S COLOR CRT TV SET
+   ========================================================================== */
+
 .teletext-workspace {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 2.2rem;
   width: 100%;
 }
 
-/* crt bezel chassis */
-.crt-bezel {
-  background: #1c1d24;
-  padding: 18px 24px 24px 24px;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8),
-    inset 0 2px 4px rgba(255, 255, 255, 0.1),
-    inset 0 -4px 10px rgba(0, 0, 0, 0.8);
-  border: 2px solid #333842;
+/* main tv set cabinet */
+.crt-tv-chassis {
   position: relative;
+  background: linear-gradient(180deg, #2b2e38 0%, #181920 100%);
+  border-radius: 28px;
+  padding: 24px 24px 28px 24px;
+  border: 3px solid #3d4251;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9),
+    inset 0 3px 6px rgba(255, 255, 255, 0.12),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.85);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.bezel-brand {
-  width: 100%;
+/* dual rabbit-ear antenna tips protruding in background */
+.tv-antenna-left {
+  position: absolute;
+  top: -38px;
+  left: 90px;
+  width: 6px;
+  height: 48px;
+  background: linear-gradient(90deg, #959fad 0%, #58606e 100%);
+  border-radius: 3px;
+  transform: rotate(-30deg);
+  z-index: -1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.tv-antenna-right {
+  position: absolute;
+  top: -38px;
+  left: 140px;
+  width: 6px;
+  height: 48px;
+  background: linear-gradient(90deg, #959fad 0%, #58606e 100%);
+  border-radius: 3px;
+  transform: rotate(30deg);
+  z-index: -1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* top heat ventilation slats */
+.tv-top-ventilation {
   display: flex;
-  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.tv-top-ventilation span {
+  width: 36px;
+  height: 4px;
+  background: #101217;
+  border-radius: 2px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9), 0 1px 1px rgba(255, 255, 255, 0.08);
+}
+
+/* front layout containing screen and right-hand control strip */
+.tv-main-front {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 20px;
+}
+
+/* deeply recessed crt screen bezel */
+.crt-screen-bezel {
+  background: #111318;
+  border-radius: 24px;
+  padding: 14px;
+  box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.95),
+    inset 0 0 2px rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(255, 255, 255, 0.08);
+  border: 2px solid #232733;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  color: #718096;
-  font-size: 0.75rem;
-  margin-bottom: 8px;
-  letter-spacing: 2px;
 }
 
-.bezel-led {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #00ff00;
-  box-shadow: 0 0 8px #00ff00;
+.crt-screen-trim {
+  border-radius: 20px;
+  background: #000000;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.95);
+  overflow: hidden;
+  position: relative;
 }
 
-.bezel-led.offline {
-  background: #ff0000;
-  box-shadow: 0 0 8px #ff0000;
-}
+/* ==========================================================================
+   3. CONVEX CATHODE RAY TUBE (CRT) BULB GLASS EFFECT
+   ========================================================================== */
 
-/* crt screen container */
-.crt-screen-container {
+.crt-glass-tube {
   position: relative;
   background: #000000;
-  border-radius: var(--crt-curvature);
   overflow: hidden;
-  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.95),
-    inset 0 0 15px rgba(0, 255, 255, 0.1);
-  border: 1px solid #1a202c;
+  transition: all 0.3s ease;
 }
 
-/* scanlines overlay */
+/* active 3d spherical convex bulb geometry */
+.crt-glass-tube.convex-active {
+  border-radius: 44px / 32px;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.95),
+    inset 0 0 110px rgba(0, 0, 0, 0.85),
+    inset 0 3px 6px rgba(255, 255, 255, 0.22),
+    0 0 25px rgba(0, 0, 0, 0.9);
+  transform: perspective(700px) scale(0.985);
+}
+
+.crt-glass-tube.flat-active {
+  border-radius: 6px;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9);
+}
+
+/* specular glass reflection glare across top quadrant */
+.crt-glass-glare {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 95% 45% at 32% 14%,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    transparent 65%
+  );
+  z-index: 25;
+}
+
+/* tube corner vignette falloff */
+.crt-vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    transparent 58%,
+    rgba(0, 0, 0, 0.35) 78%,
+    rgba(0, 0, 0, 0.88) 92%,
+    #000000 100%
+  );
+  z-index: 22;
+}
+
+/* rgb phosphor aperture grille / shadow mask */
+.crt-phosphor-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.045) 0px,
+    rgba(0, 255, 0, 0.045) 1px,
+    rgba(0, 0, 255, 0.045) 2px,
+    transparent 3px
+  );
+  z-index: 20;
+}
+
+/* horizontal raster scanlines */
 .crt-scanlines {
   position: absolute;
   top: 0;
@@ -190,41 +484,46 @@ body {
   pointer-events: none;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0) 0px,
-    rgba(255, 255, 255, 0) 2px,
-    rgba(0, 0, 0, 0.35) 2px,
-    rgba(0, 0, 0, 0.35) 4px
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.42) 2px,
+    rgba(0, 0, 0, 0.42) 4px
   );
-  z-index: 10;
+  z-index: 21;
 }
 
-/* crt glow */
+/* phosphor bloom text glow */
 .crt-glow {
-  text-shadow: 0 0 1px currentColor, 0 0 3px currentColor;
+  text-shadow: 0 0 1px currentColor, 0 0 4px currentColor;
 }
 
 /* 40x24 teletext grid viewport */
 .teletext-grid {
   display: grid;
-  grid-template-rows: repeat(24, 1.35em);
-  width: 40ch;
+  grid-template-rows: repeat(24, 1.4em);
+  width: 41ch;
   background: #000000;
-  padding: 8px 12px;
+  padding: 12px 18px;
   font-size: 20px;
-  line-height: 1.35em;
+  line-height: 1.4em;
   font-family: var(--font-teletext);
   font-weight: bold;
+  letter-spacing: 0.04em;
+  position: relative;
+  z-index: 10;
 }
 
-/* individual teletext row */
+.teletext-grid.grid-curved {
+  transform: perspective(600px) scale(0.99);
+}
+
 .tt-row {
   white-space: pre;
   display: flex;
   overflow: hidden;
-  height: 1.35em;
+  height: 1.4em;
 }
 
-/* span formatting */
 .tt-span {
   display: inline-block;
   height: 100%;
@@ -233,10 +532,10 @@ body {
 .tt-span.double {
   transform-origin: top left;
   font-weight: 900;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
-/* colors */
+/* 8 classic teletext colors */
 .fg-black { color: var(--tt-black); }
 .fg-red { color: var(--tt-red); }
 .fg-green { color: var(--tt-green); }
@@ -255,7 +554,6 @@ body {
 .bg-cyan { background-color: var(--tt-cyan); }
 .bg-white { background-color: var(--tt-white); }
 
-/* fastext row buttons on screen */
 .fastext-button {
   cursor: pointer;
   border: none;
@@ -266,159 +564,475 @@ body {
   text-align: left;
   padding: 0;
   outline: none;
+  transition: filter 0.08s;
 }
 
 .fastext-button:hover {
-  filter: brightness(1.2);
+  filter: brightness(1.25);
 }
 
-/* retro handheld tv remote */
-.remote-chassis {
-  background: #1e2029;
-  border: 2px solid #2e3440;
-  border-radius: 18px;
-  padding: 16px;
-  width: 200px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7),
-    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+.bezel-bottom-label {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  color: #5d667a;
+  letter-spacing: 1.5px;
+}
+
+/* ==========================================================================
+   4. TELEVISION RIGHT-HAND TACTILE CONTROL PANEL
+   ========================================================================== */
+
+.tv-control-panel {
+  background: linear-gradient(180deg, #22252e 0%, #15171e 100%);
+  border: 2px solid #323746;
+  border-radius: 16px;
+  padding: 16px 14px;
+  width: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.08), 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.tv-brand-plate {
+  text-align: center;
+  border-bottom: 1px solid #363c4c;
+  padding-bottom: 8px;
+  width: 100%;
+}
+
+.brand-logo {
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--gold-accent);
+  text-shadow: 0 0 6px rgba(196, 154, 69, 0.3);
+}
+
+.brand-sub {
+  font-size: 0.55rem;
+  color: #727b8e;
+  letter-spacing: 1px;
+}
+
+/* rotary channel selector */
+.tv-knob-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.tv-knob-title {
+  font-size: 0.6rem;
+  font-weight: bold;
+  color: #8c97ad;
+  letter-spacing: 1px;
+}
+
+.tv-rotary-dial {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  background: radial-gradient(circle, #3d4352 30%, #1b1e26 90%);
+  border: 3px solid #586074;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8),
+    inset 0 2px 3px rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease;
+}
+
+.tv-rotary-dial:active {
+  transform: rotate(25deg);
+}
+
+.rotary-notch {
+  width: 4px;
+  height: 20px;
+  background: var(--gold-accent);
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(196, 154, 69, 0.6);
+}
+
+.dial-numbers {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  font-size: 0.65rem;
+  font-weight: bold;
+  color: #a4afc5;
+}
+
+.d-100 { position: absolute; top: 2px; left: 26px; }
+.d-201 { position: absolute; top: 18px; right: 4px; }
+.d-301 { position: absolute; bottom: 8px; right: 12px; }
+.d-401 { position: absolute; bottom: 8px; left: 12px; }
+.d-999 { position: absolute; top: 18px; left: 4px; }
+
+/* small analog potentiometers */
+.tv-knob-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 6px;
+}
+
+.tv-small-knob {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.tv-sub-title {
+  font-size: 0.55rem;
+  color: #798397;
+  font-weight: bold;
+}
+
+.small-dial {
+  width: 28px;
+  height: 28px;
+  background: radial-gradient(circle, #3e4454 20%, #16181f 90%);
+  border: 2px solid #4a5266;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  position: relative;
+}
+
+.small-dial::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 12px;
+  width: 2px;
+  height: 8px;
+  background: #ffffff;
+  border-radius: 1px;
+}
+
+.small-dial.tuned::after {
+  transform: rotate(40deg);
+}
+
+/* master power section & red glowing pilot lamp */
+.tv-power-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.tv-pilot-lamp {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #2a0808;
+  border: 2px solid #471111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tv-pilot-lamp.on .lamp-bulb {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff2a2a;
+  box-shadow: 0 0 10px #ff2a2a, 0 0 18px #ff0000;
+}
+
+.tv-power-label {
+  font-size: 0.58rem;
+  font-weight: bold;
+  color: #a02020;
+  letter-spacing: 1px;
+}
+
+/* speaker acoustic louvers */
+.tv-speaker-grille {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.speaker-slot {
+  height: 3px;
+  background: #0d0e12;
+  border-radius: 1px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.95), 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ==========================================================================
+   5. AUTHENTIC 1980S INFRARED REMOTE COMMANDER
+   ========================================================================== */
+
+.vintage-remote-commander {
+  background: linear-gradient(180deg, #242732 0%, #15171e 100%);
+  border: 3px solid #373c4d;
+  border-radius: 20px;
+  padding: 18px 16px;
+  width: 220px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85),
+    inset 0 2px 4px rgba(255, 255, 255, 0.12),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.remote-header {
-  text-align: center;
-  font-size: 0.75rem;
-  color: #718096;
-  font-weight: bold;
-  letter-spacing: 2px;
-  border-bottom: 1px solid #2e3440;
+/* infrared diode top head */
+.remote-ir-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #2d3240;
   padding-bottom: 8px;
 }
 
-.remote-input-display {
-  background: #000000;
-  border: 1px solid #4a5568;
-  color: var(--tt-yellow);
-  font-family: var(--font-teletext);
-  font-size: 1.25rem;
-  text-align: center;
-  padding: 6px;
-  letter-spacing: 4px;
-  border-radius: 4px;
+.remote-ir-emitter {
+  width: 12px;
+  height: 12px;
+  background: #470d0d;
+  border: 2px solid #731818;
+  border-radius: 50%;
+  display: inline-block;
+  transition: all 0.05s ease;
 }
 
+.remote-ir-emitter.ir-transmitting {
+  background: #ff2222;
+  border-color: #ff6666;
+  box-shadow: 0 0 14px #ff0000, 0 0 24px #ff3333;
+}
+
+.remote-brand-tag {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #798397;
+  letter-spacing: 1.5px;
+}
+
+.remote-inner-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* lcd digital channel memory window */
+.remote-lcd-window {
+  background: #0f130e;
+  border: 2px solid #262e24;
+  border-radius: 6px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.9);
+}
+
+.lcd-header {
+  font-size: 0.55rem;
+  color: #4f634b;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.lcd-digits {
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #55ff55;
+  text-shadow: 0 0 8px rgba(85, 255, 85, 0.6);
+  font-family: var(--font-teletext);
+}
+
+.lcd-sub-info {
+  font-size: 0.6rem;
+  color: #4f634b;
+  font-weight: bold;
+}
+
+.remote-section-title {
+  font-size: 0.58rem;
+  font-weight: bold;
+  color: #798397;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+/* fastext rubber keys */
 .remote-fastext-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
+  gap: 8px;
 }
 
-.remote-btn {
+.remote-rubber-btn {
   border: none;
   border-radius: 6px;
   font-family: var(--font-teletext);
   font-weight: bold;
-  font-size: 0.8rem;
   padding: 8px 4px;
   cursor: pointer;
-  text-transform: uppercase;
-  transition: transform 0.05s, filter 0.1s;
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.7);
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
 }
 
-.remote-btn:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+.remote-rubber-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
 }
 
-.btn-red { background: var(--tt-red); color: var(--tt-white); }
-.btn-green { background: var(--tt-green); color: var(--tt-black); }
-.btn-yellow { background: var(--tt-yellow); color: var(--tt-black); }
-.btn-cyan { background: var(--tt-cyan); color: var(--tt-black); }
+.remote-rubber-btn .key-tag { font-size: 0.7rem; }
+.remote-rubber-btn .key-code { font-size: 0.65rem; opacity: 0.85; }
 
-.remote-numpad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
+.fastext-red { background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%); color: #ffffff; }
+.fastext-green { background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%); color: #000000; }
+.fastext-yellow { background: linear-gradient(180deg, #f1c40f 0%, #f39c12 100%); color: #000000; }
+.fastext-cyan { background: linear-gradient(180deg, #1abc9c 0%, #16a085 100%); color: #000000; }
 
-.numpad-btn {
-  background: #2b303c;
-  color: #ffffff;
-  border: 1px solid #3e4452;
-  border-radius: 6px;
-  padding: 10px 0;
-  font-family: var(--font-teletext);
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.6);
-}
-
-.numpad-btn:hover {
-  background: #383e4d;
-}
-
-.numpad-btn:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
-}
-
-.remote-subpage-controls {
+/* subpage carousel rocker buttons */
+.remote-subpage-rocker {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.subpage-btn {
-  background: #3b4252;
-  color: #eceff4;
-  border: 1px solid #4c566a;
+.rocker-btn {
+  background: #333947;
+  color: #e5e9f0;
+  border: 1px solid #434c5e;
   border-radius: 6px;
-  padding: 8px;
+  padding: 8px 4px;
   font-family: var(--font-teletext);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: bold;
   cursor: pointer;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.6);
+  transition: transform 0.05s;
 }
 
-.subpage-btn:hover {
-  background: #434c5e;
+.rocker-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
 }
 
-/* footer guide */
-.p100-guide {
-  margin-top: 1.5rem;
+/* tactile numpad matrix */
+.remote-numpad-matrix {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.numpad-key {
+  background: #2b303d;
+  color: #ffffff;
+  border: 1px solid #3e4557;
+  border-radius: 6px;
+  padding: 10px 0;
+  font-family: var(--font-teletext);
+  font-size: 1.15rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.7);
+  transition: transform 0.05s;
+}
+
+.numpad-key:hover {
+  background: #373e4f;
+}
+
+.numpad-key:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+.numpad-key.key-clear {
+  color: #e74c3c;
   font-size: 0.8rem;
-  color: #718096;
+}
+
+.numpad-key.key-idx {
+  color: #f1c40f;
+  font-size: 0.8rem;
+}
+
+.remote-bottom-badge {
+  text-align: center;
+  font-size: 0.55rem;
+  color: #555e73;
+  letter-spacing: 1.5px;
+  border-top: 1px solid #2b303d;
+  padding-top: 6px;
+}
+
+/* ==========================================================================
+   6. FOOTER GUIDE & RESPONSIVENESS
+   ========================================================================== */
+
+.p100-guide {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: #798397;
   text-align: center;
   max-width: 900px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .p100-guide kbd {
-  background: #2d3748;
+  background: #1e222c;
   color: #e2e8f0;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 3px;
-  border: 1px solid #4a5568;
+  border: 1px solid #3c4456;
+  font-weight: bold;
 }
 
-/* responsive scaling for small displays */
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   .teletext-workspace {
     flex-direction: column;
     align-items: center;
   }
 }
 
-@media (max-width: 640px) {
-  .teletext-grid {
-    font-size: 14px;
-    padding: 4px;
+@media (max-width: 680px) {
+  .retro-rack-hud {
+    padding: 0.6rem 0.8rem;
   }
-  .crt-bezel {
+  .rack-meters {
+    flex-wrap: wrap;
+  }
+  .teletext-grid {
+    font-size: 13px;
     padding: 8px;
+    width: 40ch;
+  }
+  .crt-tv-chassis {
+    padding: 12px;
+  }
+  .tv-main-front {
+    flex-direction: column;
+  }
+  .tv-control-panel {
+    width: 100%;
+    flex-direction: row;
+    padding: 8px 12px;
   }
 }

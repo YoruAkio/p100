@@ -8,6 +8,8 @@ import { TeletextHUD } from './components/TeletextHUD';
 import { TeletextRemote } from './components/TeletextRemote';
 import { TeletextScreen } from './components/TeletextScreen';
 
+const CHANNELS = ['100', '201', '301', '401', '999'];
+
 export const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<string>('100');
   const [subpage, setSubpage] = useState<number>(1);
@@ -18,12 +20,25 @@ export const App: React.FC = () => {
   const [slow2G, setSlow2G] = useState<boolean>(false);
   const [scanlines, setScanlines] = useState<boolean>(true);
   const [glow, setGlow] = useState<boolean>(true);
+  const [convex, setConvex] = useState<boolean>(true);
+  const [irBlink, setIrBlink] = useState<boolean>(false);
 
   const rollTimerRef = useRef<number | null>(null);
+  const irTimerRef = useRef<number | null>(null);
+
+  // flash infrared transmitter on remote
+  const triggerIrFlash = useCallback(() => {
+    setIrBlink(true);
+    if (irTimerRef.current) clearTimeout(irTimerRef.current);
+    irTimerRef.current = window.setTimeout(() => {
+      setIrBlink(false);
+    }, 150);
+  }, []);
 
   // fetch page from edge api
   const fetchPage = useCallback(
     async (code: string, sub: number) => {
+      triggerIrFlash();
       const startTime = performance.now();
 
       // trigger teletext header roll animation
@@ -74,7 +89,7 @@ export const App: React.FC = () => {
         setSubpage(1);
       }
     },
-    [slow2G],
+    [slow2G, triggerIrFlash],
   );
 
   // navigate to a specific page
@@ -86,9 +101,17 @@ export const App: React.FC = () => {
     [fetchPage],
   );
 
+  // cycle channel on tv physical rotary knob
+  const handleChannelKnob = useCallback(() => {
+    const currentIndex = CHANNELS.indexOf(currentPage);
+    const nextIndex = (currentIndex + 1) % CHANNELS.length;
+    navigateTo(CHANNELS[nextIndex]);
+  }, [currentPage, navigateTo]);
+
   // handle digit keypad input
   const handleDigit = useCallback(
     (digit: string) => {
+      triggerIrFlash();
       const next = `${inputBuffer}${digit}`;
       if (next.length === 3) {
         setInputBuffer('');
@@ -97,12 +120,13 @@ export const App: React.FC = () => {
         setInputBuffer(next);
       }
     },
-    [inputBuffer, navigateTo],
+    [inputBuffer, navigateTo, triggerIrFlash],
   );
 
   // handle subpage change
   const handleSubpageChange = useCallback(
     (direction: 'prev' | 'next') => {
+      triggerIrFlash();
       if (frame.totalSubpages <= 1) return;
       let nextSub = subpage;
       if (direction === 'prev') {
@@ -112,13 +136,12 @@ export const App: React.FC = () => {
       }
       fetchPage(currentPage, nextSub);
     },
-    [currentPage, fetchPage, frame.totalSubpages, subpage],
+    [currentPage, fetchPage, frame.totalSubpages, subpage, triggerIrFlash],
   );
 
   // listen to global keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // ignore if typing in form inputs
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return;
       }
@@ -154,16 +177,18 @@ export const App: React.FC = () => {
         e.preventDefault();
         navigateTo('100');
       } else if (e.key === 'Backspace') {
+        triggerIrFlash();
         setInputBuffer((prev) => prev.slice(0, -1));
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [frame.fastext, handleDigit, handleSubpageChange, navigateTo]);
+  }, [frame.fastext, handleDigit, handleSubpageChange, navigateTo, triggerIrFlash]);
 
   return (
     <div className="p100-app">
+      {/* retro broadcast telemetry rack HUD */}
       <TeletextHUD
         bytes={frame.bytes || 1200}
         latencyMs={latencyMs}
@@ -174,17 +199,23 @@ export const App: React.FC = () => {
         onToggleScanlines={setScanlines}
         glow={glow}
         onToggleGlow={setGlow}
+        convex={convex}
+        onToggleConvex={setConvex}
       />
 
       <main className="teletext-workspace">
+        {/* vintage 1980s color crt tv set */}
         <TeletextScreen
           frame={frame}
           rollingCode={rollingCode}
           onNavigate={navigateTo}
           scanlines={scanlines}
           glow={glow}
+          convex={convex}
+          onChannelKnobClick={handleChannelKnob}
         />
 
+        {/* authentic handheld infrared remote */}
         <TeletextRemote
           inputBuffer={inputBuffer}
           currentPage={currentPage}
@@ -192,18 +223,22 @@ export const App: React.FC = () => {
           totalSubpages={frame.totalSubpages}
           fastext={frame.fastext}
           onDigitPress={handleDigit}
-          onClear={() => setInputBuffer('')}
+          onClear={() => {
+            triggerIrFlash();
+            setInputBuffer('');
+          }}
           onSubpageChange={handleSubpageChange}
           onNavigate={navigateTo}
+          irBlink={irBlink}
         />
       </main>
 
       <footer className="p100-guide">
         <p>
-          Keyboard Controls: <kbd>0-9</kbd> Jump Page | <kbd>R</kbd> Red | <kbd>G</kbd> Green | <kbd>Y</kbd> Yellow | <kbd>C</kbd> Cyan | <kbd>&larr;/&rarr;</kbd> Subpage | <kbd>Esc</kbd> Index P100
+          Hardware Controls: <kbd>0-9</kbd> Jump Page | <kbd>R</kbd> Red | <kbd>G</kbd> Green | <kbd>Y</kbd> Yellow | <kbd>C</kbd> Cyan | <kbd>&larr;/&rarr;</kbd> Subpage | <kbd>Esc</kbd> Index P100
         </p>
         <p style={{ marginTop: '0.4rem', color: '#4a5568' }}>
-          Kiroween 2026 Hackathon &bull; Resurrection Category &bull; Sub-2KB Edge Broadcast
+          Kiroween 2026 Hackathon &bull; Resurrection Category &bull; 1980s CRT Teletext Broadcast Terminal
         </p>
       </footer>
     </div>
