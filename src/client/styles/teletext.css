@@ -1,0 +1,424 @@
+/* authentic 1980s teletext crt and terminal styling */
+
+:root {
+  --tt-black: #000000;
+  --tt-red: #ff0000;
+  --tt-green: #00ff00;
+  --tt-yellow: #ffff00;
+  --tt-blue: #0000ff;
+  --tt-magenta: #ff00ff;
+  --tt-cyan: #00ffff;
+  --tt-white: #ffffff;
+
+  --font-teletext: 'Courier New', Courier, 'Lucida Console', 'Liberation Mono', monospace;
+  --crt-curvature: 8px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #0b0c10;
+  color: var(--tt-white);
+  font-family: var(--font-teletext);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* app layout */
+.p100-app {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0.5rem;
+}
+
+/* hud header */
+.p100-hud {
+  width: 100%;
+  max-width: 980px;
+  background: #151821;
+  border: 1px solid #2d3748;
+  border-radius: 4px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.hud-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hud-brand {
+  font-weight: bold;
+  color: var(--tt-yellow);
+  letter-spacing: 1px;
+}
+
+.hud-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.hud-badge.green {
+  background: rgba(0, 255, 0, 0.15);
+  color: var(--tt-green);
+  border: 1px solid var(--tt-green);
+}
+
+.hud-badge.yellow {
+  background: rgba(255, 255, 0, 0.15);
+  color: var(--tt-yellow);
+  border: 1px solid var(--tt-yellow);
+}
+
+.hud-badge.red {
+  background: rgba(255, 0, 0, 0.15);
+  color: var(--tt-red);
+  border: 1px solid var(--tt-red);
+}
+
+.hud-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hud-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #a0aec0;
+  cursor: pointer;
+}
+
+.hud-toggle-label input {
+  cursor: pointer;
+}
+
+/* main terminal workspace */
+.teletext-workspace {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* crt bezel chassis */
+.crt-bezel {
+  background: #1c1d24;
+  padding: 18px 24px 24px 24px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.8);
+  border: 2px solid #333842;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bezel-brand {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #718096;
+  font-size: 0.75rem;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+
+.bezel-led {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00ff00;
+  box-shadow: 0 0 8px #00ff00;
+}
+
+.bezel-led.offline {
+  background: #ff0000;
+  box-shadow: 0 0 8px #ff0000;
+}
+
+/* crt screen container */
+.crt-screen-container {
+  position: relative;
+  background: #000000;
+  border-radius: var(--crt-curvature);
+  overflow: hidden;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.95),
+    inset 0 0 15px rgba(0, 255, 255, 0.1);
+  border: 1px solid #1a202c;
+}
+
+/* scanlines overlay */
+.crt-scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0px,
+    rgba(255, 255, 255, 0) 2px,
+    rgba(0, 0, 0, 0.35) 2px,
+    rgba(0, 0, 0, 0.35) 4px
+  );
+  z-index: 10;
+}
+
+/* crt glow */
+.crt-glow {
+  text-shadow: 0 0 1px currentColor, 0 0 3px currentColor;
+}
+
+/* 40x24 teletext grid viewport */
+.teletext-grid {
+  display: grid;
+  grid-template-rows: repeat(24, 1.35em);
+  width: 40ch;
+  background: #000000;
+  padding: 8px 12px;
+  font-size: 20px;
+  line-height: 1.35em;
+  font-family: var(--font-teletext);
+  font-weight: bold;
+}
+
+/* individual teletext row */
+.tt-row {
+  white-space: pre;
+  display: flex;
+  overflow: hidden;
+  height: 1.35em;
+}
+
+/* span formatting */
+.tt-span {
+  display: inline-block;
+  height: 100%;
+}
+
+.tt-span.double {
+  transform-origin: top left;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+/* colors */
+.fg-black { color: var(--tt-black); }
+.fg-red { color: var(--tt-red); }
+.fg-green { color: var(--tt-green); }
+.fg-yellow { color: var(--tt-yellow); }
+.fg-blue { color: var(--tt-blue); }
+.fg-magenta { color: var(--tt-magenta); }
+.fg-cyan { color: var(--tt-cyan); }
+.fg-white { color: var(--tt-white); }
+
+.bg-black { background-color: var(--tt-black); }
+.bg-red { background-color: var(--tt-red); }
+.bg-green { background-color: var(--tt-green); }
+.bg-yellow { background-color: var(--tt-yellow); }
+.bg-blue { background-color: var(--tt-blue); }
+.bg-magenta { background-color: var(--tt-magenta); }
+.bg-cyan { background-color: var(--tt-cyan); }
+.bg-white { background-color: var(--tt-white); }
+
+/* fastext row buttons on screen */
+.fastext-button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: bold;
+  text-align: left;
+  padding: 0;
+  outline: none;
+}
+
+.fastext-button:hover {
+  filter: brightness(1.2);
+}
+
+/* retro handheld tv remote */
+.remote-chassis {
+  background: #1e2029;
+  border: 2px solid #2e3440;
+  border-radius: 18px;
+  padding: 16px;
+  width: 200px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.remote-header {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #718096;
+  font-weight: bold;
+  letter-spacing: 2px;
+  border-bottom: 1px solid #2e3440;
+  padding-bottom: 8px;
+}
+
+.remote-input-display {
+  background: #000000;
+  border: 1px solid #4a5568;
+  color: var(--tt-yellow);
+  font-family: var(--font-teletext);
+  font-size: 1.25rem;
+  text-align: center;
+  padding: 6px;
+  letter-spacing: 4px;
+  border-radius: 4px;
+}
+
+.remote-fastext-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.remote-btn {
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-teletext);
+  font-weight: bold;
+  font-size: 0.8rem;
+  padding: 8px 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: transform 0.05s, filter 0.1s;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
+}
+
+.remote-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.btn-red { background: var(--tt-red); color: var(--tt-white); }
+.btn-green { background: var(--tt-green); color: var(--tt-black); }
+.btn-yellow { background: var(--tt-yellow); color: var(--tt-black); }
+.btn-cyan { background: var(--tt-cyan); color: var(--tt-black); }
+
+.remote-numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.numpad-btn {
+  background: #2b303c;
+  color: #ffffff;
+  border: 1px solid #3e4452;
+  border-radius: 6px;
+  padding: 10px 0;
+  font-family: var(--font-teletext);
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+.numpad-btn:hover {
+  background: #383e4d;
+}
+
+.numpad-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.remote-subpage-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.subpage-btn {
+  background: #3b4252;
+  color: #eceff4;
+  border: 1px solid #4c566a;
+  border-radius: 6px;
+  padding: 8px;
+  font-family: var(--font-teletext);
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.subpage-btn:hover {
+  background: #434c5e;
+}
+
+/* footer guide */
+.p100-guide {
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  color: #718096;
+  text-align: center;
+  max-width: 900px;
+  line-height: 1.5;
+}
+
+.p100-guide kbd {
+  background: #2d3748;
+  color: #e2e8f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #4a5568;
+}
+
+/* responsive scaling for small displays */
+@media (max-width: 960px) {
+  .teletext-workspace {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .teletext-grid {
+    font-size: 14px;
+    padding: 4px;
+  }
+  .crt-bezel {
+    padding: 8px;
+  }
+}

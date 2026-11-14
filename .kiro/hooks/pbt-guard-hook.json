@@ -1,0 +1,13 @@
+{
+  "name": "pbt-teletext-guard",
+  "description": "Runs property-based tests whenever teletext formatter or server code changes",
+  "triggers": [
+    "file_save",
+    "pre_commit"
+  ],
+  "patterns": [
+    "src/teletext/**/*.ts",
+    "src/server/**/*.ts"
+  ],
+  "command": "bun test run tests/teletext.pbt.test.ts"
+}
