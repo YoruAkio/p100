@@ -9,7 +9,11 @@ import { getEmergencyPage } from '../src/server/services/emergency';
 import { getIndexPage } from '../src/server/services/indexPage';
 import { getTransitPage } from '../src/server/services/transit';
 import { getWeatherPage } from '../src/server/services/weather';
+import { getCached } from '../src/server/cache';
+import { transmitBell202Afsk } from '../src/client/audio';
 import { TeletextFrameResponse } from '../src/teletext/types';
+import fs from 'node:fs';
+import path from 'node:path';
 
 describe('Teletext Edge Services', () => {
   it('returns valid master index page 100', () => {
@@ -125,5 +129,69 @@ describe('Hono Edge Router Endpoints', () => {
     expect(res.status).toBe(404);
     const data = (await res.json()) as TeletextFrameResponse;
     expect(data.code).toBe('404');
+  });
+
+  it('handles localized weather queries with lat and lon parameters', async () => {
+    const res = await app.request('/api/page/201?subpage=2&lat=35.6762&lon=139.6503');
+    expect(res.status).toBe(200);
+    const data = (await res.json()) as TeletextFrameResponse;
+    expect(data.subpage).toBe(2);
+    expect(data.rows.length).toBe(24);
+    expect(data.bytes).toBeLessThan(2048);
+    // checks that coords row contains formatted coordinates
+    const allText = data.rows.map((r) => r.map((s) => s.t).join('')).join('\n');
+    expect(allText).toContain('35.68N 139.65E');
+  });
+});
+
+describe('Edge Resilient Cache Helper', () => {
+  it('caches results and reuses them within TTL', async () => {
+    let callCount = 0;
+    const fetcher = async () => {
+      callCount++;
+      return { timestamp: Date.now(), count: callCount };
+    };
+
+    const first = await getCached('test-key', fetcher, 5);
+    expect(first.cached).toBe(false);
+    expect(first.data.count).toBe(1);
+
+    const second = await getCached('test-key', fetcher, 5);
+    expect(second.cached).toBe(true);
+    expect(second.data.count).toBe(1);
+    expect(callCount).toBe(1);
+  });
+});
+
+describe('Bell 202 AFSK 1200 Audio Modulation', () => {
+  it('safely handles disabled or headless environments without errors', () => {
+    const disabled = transmitBell202Afsk('P100 EMERGENCY ALERT', false);
+    expect(disabled).toBeNull();
+
+    // in headless / node environment without Web Audio API, returns null cleanly
+    const result = transmitBell202Afsk('P100 EMERGENCY ALERT', true);
+    // either returns transmission object if Web Audio mocked/present, or null safely
+    if (result) {
+      expect(typeof result.stop).toBe('function');
+      expect(result.durationMs).toBeGreaterThan(0);
+    } else {
+      expect(result).toBeNull();
+    }
+  });
+});
+
+describe('Offline Crisis PWA & Service Worker', () => {
+  it('provides valid service worker and web app manifest in public directory', () => {
+    const swPath = path.resolve(__dirname, '../public/sw.js');
+    expect(fs.existsSync(swPath)).toBe(true);
+    const swContent = fs.readFileSync(swPath, 'utf-8');
+    expect(swContent).toContain('CACHE_NAME');
+    expect(swContent).toContain('/api/page/');
+
+    const manifestPath = path.resolve(__dirname, '../public/manifest.webmanifest');
+    expect(fs.existsSync(manifestPath)).toBe(true);
+    const manifestJson = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+    expect(manifestJson.name).toBe('P100 Teletext Crisis Portal');
+    expect(manifestJson.display).toBe('standalone');
   });
 });

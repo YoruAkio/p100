@@ -18,6 +18,7 @@ interface TeletextHUDProps {
   onToggleAudio: (enabled: boolean) => void;
   hold: boolean;
   copied: boolean;
+  afskActive?: boolean;
 }
 
 export const TeletextHUD: React.FC<TeletextHUDProps> = ({
@@ -36,6 +37,7 @@ export const TeletextHUD: React.FC<TeletextHUDProps> = ({
   onToggleAudio,
   hold,
   copied,
+  afskActive = false,
 }) => {
   const isBudgetOk = bytes < 2048;
 
@@ -89,6 +91,14 @@ export const TeletextHUD: React.FC<TeletextHUDProps> = ({
           <span className="led-label">SUBPAGE FEED</span>
           <div className={`led-display ${hold ? 'led-amber' : 'led-green'}`}>
             <span className="led-digits">{hold ? 'HOLD' : 'AUTO-ROLL'}</span>
+          </div>
+        </div>
+
+        {/* bell 202 modem indicator */}
+        <div className="led-readout-panel">
+          <span className="led-label">BELL 202 MODEM</span>
+          <div className={`led-display ${afskActive ? 'led-red blink' : 'led-amber'}`}>
+            <span className="led-digits">{afskActive ? 'TX 1200' : 'STANDBY'}</span>
           </div>
         </div>
 

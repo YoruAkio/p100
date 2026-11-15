@@ -884,6 +884,29 @@ body {
   box-shadow: 0 0 10px rgba(46, 204, 113, 0.8);
 }
 
+.remote-util-btn.btn-afsk {
+  background: #1e293b;
+  color: #38bdf8;
+  border-color: #0284c7;
+}
+
+.remote-util-btn.btn-afsk.afsk-transmitting {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #ef4444;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.9);
+  animation: pulse-tx 0.5s infinite alternate;
+}
+
+@keyframes pulse-tx {
+  from { opacity: 1; }
+  to { opacity: 0.7; }
+}
+
+.led-display.blink {
+  animation: pulse-tx 0.4s infinite alternate;
+}
+
 .remote-bottom-badge {
   text-align: center;
   font-size: 0.55rem;

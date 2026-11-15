@@ -1,0 +1,17 @@
+{
+  "name": "P100 Teletext Crisis Portal",
+  "short_name": "P100",
+  "description": "Resurrected 1980s Teletext crisis and transit broadcast portal. Sub-2KB edge transmission.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050608",
+  "theme_color": "#0000aa",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -3,6 +3,7 @@
 import { assembleFrame } from '../../teletext/formatter';
 import { sanitizeTeletextString } from '../../teletext/sanitizer';
 import { FastextNav, TeletextFrameResponse, TeletextSpan } from '../../teletext/types';
+import { getCached } from '../cache';
 
 interface USGSFeature {
   properties: {
@@ -26,45 +27,59 @@ const FALLBACK_QUAKES = [
   { mag: 4.8, place: 'SOUTHERN CALIFORNIA, USA', minsAgo: 110, alert: 'NOTICE' },
 ];
 
-// fetch live usgs 4.5+ daily earthquakes with timeout
+// fetch live usgs 4.5+ daily earthquakes with edge caching and timeout
 // return assembled p201 subpage 1 frame
 export async function getEarthquakePage(): Promise<TeletextFrameResponse> {
   let isFallback = false;
+  let isCached = false;
   let quakes = FALLBACK_QUAKES;
 
   try {
-    const res = await fetch(
-      'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson',
-      {
-        signal: AbortSignal.timeout(3000),
-        headers: { 'Accept': 'application/json' },
+    const { data, cached } = await getCached<USGSResponse>(
+      'usgs-4.5-day',
+      async () => {
+        const res = await fetch(
+          'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson',
+          {
+            signal: AbortSignal.timeout(3000),
+            headers: { 'Accept': 'application/json' },
+          },
+        );
+        if (!res.ok) {
+          throw new Error(`USGS HTTP ${res.status}`);
+        }
+        return (await res.json()) as USGSResponse;
       },
+      60,
     );
 
-    if (res.ok) {
-      const data = (await res.json()) as USGSResponse;
-      if (Array.isArray(data.features) && data.features.length > 0) {
-        // sort severity-first (highest magnitude first)
-        const sorted = [...data.features].sort((a, b) => (b.properties.mag ?? 0) - (a.properties.mag ?? 0));
-        const now = Date.now();
-        quakes = sorted.slice(0, 5).map((f) => {
-          const mag = f.properties.mag ?? 4.5;
-          const mins = Math.max(1, Math.round((now - f.properties.time) / 60000));
-          const alert = mag >= 6.5 ? 'CRITICAL' : mag >= 5.5 ? 'WARNING' : 'ALERT';
-          return {
-            mag,
-            place: sanitizeTeletextString(f.properties.place || 'PACIFIC SEISMIC ZONE').toUpperCase(),
-            minsAgo: mins,
-            alert,
-          };
-        });
-      }
-    } else {
-      isFallback = true;
+    isCached = cached;
+    if (Array.isArray(data.features) && data.features.length > 0) {
+      // sort severity-first (highest magnitude first)
+      const sorted = [...data.features].sort((a, b) => (b.properties.mag ?? 0) - (a.properties.mag ?? 0));
+      const now = Date.now();
+      quakes = sorted.slice(0, 5).map((f) => {
+        const mag = f.properties.mag ?? 4.5;
+        const mins = Math.max(1, Math.round((now - f.properties.time) / 60000));
+        const alert = mag >= 6.5 ? 'CRITICAL' : mag >= 5.5 ? 'WARNING' : 'ALERT';
+        return {
+          mag,
+          place: sanitizeTeletextString(f.properties.place || 'PACIFIC SEISMIC ZONE').toUpperCase(),
+          minsAgo: mins,
+          alert,
+        };
+      });
     }
   } catch {
     isFallback = true;
   }
+
+  const feedLabel = isFallback
+    ? 'OFFLINE CACHE (FALLBACK)'
+    : isCached
+      ? 'EDGE CACHE (USGS 60S)'
+      : 'LIVE USGS REALTIME';
+  const feedColor = isFallback ? 'yellow' : isCached ? 'cyan' : 'green';
 
   const bodyRows: TeletextSpan[][] = [
     [
@@ -74,7 +89,7 @@ export async function getEarthquakePage(): Promise<TeletextFrameResponse> {
     ],
     [
       { t: 'FEED: ', c: 'white' },
-      { t: isFallback ? 'OFFLINE CACHE (FALLBACK)' : 'LIVE USGS REALTIME', c: isFallback ? 'yellow' : 'green' },
+      { t: feedLabel, c: feedColor },
       { t: '  SORT: SEV', c: 'cyan' },
     ],
     [{ t: '----------------------------------------', c: 'blue' }],

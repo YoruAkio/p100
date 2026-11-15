@@ -38,6 +38,9 @@ P100 is an ultra-low-bandwidth, high-resilience crisis communication and transit
   - `C` or `c`: Cyan link
 - **Subpage Carousel & Hold:** Auto-rotates multi-subpage broadcasts (every 10s). Press `Space` or `O` (or click `HOLD` / `ROLL` on the remote) to toggle auto-roll lock. Press `Left Arrow` or `Right Arrow` for manual stepping.
 - **LoRa & HAM Radio Packet Export:** Press `X` or `P` (or click `COPY RADIO PACKET` on the remote) to export the raw 40x24 ASCII frame to clipboard for packet radio / SMS gateways.
+- **Bell 202 AFSK 1200 Audio Broadcast:** Press `B` or `T` (or click `BROADCAST AFSK` on the remote) to modulate the emergency packet into continuous-phase 1200 baud Bell 202 audio tones (1200 Hz mark / 2200 Hz space) directly out of the device speaker for handheld analog radio relay.
+- **Offline Crisis Mode (PWA & Service Worker):** Automatically precaches shell assets and provides fallback teletext frames for 100% air-gapped grid-down operation.
+- **Localized Coordinates:** Automatically passes user geolocation to `P201` weather feeds for localized barometric and crisis outlook data.
 - **Reset:** Press `Esc` or `H` to return to Master Index P100.
 - **HUD Toggles:** Toggle CRT scanlines, phosphor glow, 3D convex curvature, 1980s Web Audio synthesized sound FX, or Slow-2G simulation mode (2,500ms delay) in the top rack-mount header.
 

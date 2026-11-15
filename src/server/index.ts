@@ -57,7 +57,11 @@ app.get('/api/page/:code', async (c) => {
 
     case '201':
       if (subpage === 2) {
-        frame = await getWeatherPage();
+        const latParam = c.req.query('lat');
+        const lonParam = c.req.query('lon');
+        const lat = latParam ? parseFloat(latParam) : undefined;
+        const lon = lonParam ? parseFloat(lonParam) : undefined;
+        frame = await getWeatherPage(lat, lon);
       } else {
         frame = await getEarthquakePage();
       }

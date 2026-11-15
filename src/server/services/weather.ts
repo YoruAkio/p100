@@ -2,6 +2,7 @@
 
 import { assembleFrame } from '../../teletext/formatter';
 import { FastextNav, TeletextFrameResponse, TeletextSpan } from '../../teletext/types';
+import { getCached } from '../cache';
 
 interface OpenMeteoResponse {
   current?: {
@@ -35,42 +36,64 @@ const FALLBACK_WEATHER = {
   sev: 'WARNING',
 };
 
-// fetch open-meteo severe weather and metrics
+// fetch open-meteo severe weather and metrics with edge cache and localized coordinates
 // return assembled p201 subpage 2 frame
-export async function getWeatherPage(): Promise<TeletextFrameResponse> {
+export async function getWeatherPage(
+  lat = 51.5074,
+  lon = -0.1278,
+): Promise<TeletextFrameResponse> {
+  const safeLat = typeof lat === 'number' && !isNaN(lat) && lat >= -90 && lat <= 90 ? lat : 51.5074;
+  const safeLon = typeof lon === 'number' && !isNaN(lon) && lon >= -180 && lon <= 180 ? lon : -0.1278;
+
   let isFallback = false;
+  let isCached = false;
   let metrics = FALLBACK_WEATHER;
 
+  const cacheKey = `weather-${safeLat.toFixed(2)}_${safeLon.toFixed(2)}`;
+
   try {
-    const res = await fetch(
-      'https://api.open-meteo.com/v1/forecast?latitude=51.5074&longitude=-0.1278&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,surface_pressure',
-      {
-        signal: AbortSignal.timeout(3000),
-        headers: { 'Accept': 'application/json' },
+    const { data, cached } = await getCached<OpenMeteoResponse>(
+      cacheKey,
+      async () => {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${safeLat.toFixed(4)}&longitude=${safeLon.toFixed(4)}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,surface_pressure`;
+        const res = await fetch(url, {
+          signal: AbortSignal.timeout(3000),
+          headers: { 'Accept': 'application/json' },
+        });
+        if (!res.ok) {
+          throw new Error(`Open-Meteo HTTP ${res.status}`);
+        }
+        return (await res.json()) as OpenMeteoResponse;
       },
+      120,
     );
 
-    if (res.ok) {
-      const data = (await res.json()) as OpenMeteoResponse;
-      if (data.current) {
-        const decoded = decodeWeatherCode(data.current.weather_code);
-        metrics = {
-          temp: data.current.temperature_2m ?? 15,
-          humidity: data.current.relative_humidity_2m ?? 70,
-          windSpeed: data.current.wind_speed_10m ?? 20,
-          pressure: data.current.surface_pressure ?? 1013,
-          condition: decoded.condition,
-          sev: decoded.sev,
-        };
-      }
-    } else {
-      isFallback = true;
+    isCached = cached;
+    if (data.current) {
+      const decoded = decodeWeatherCode(data.current.weather_code);
+      metrics = {
+        temp: data.current.temperature_2m ?? 15,
+        humidity: data.current.relative_humidity_2m ?? 70,
+        windSpeed: data.current.wind_speed_10m ?? 20,
+        pressure: data.current.surface_pressure ?? 1013,
+        condition: decoded.condition,
+        sev: decoded.sev,
+      };
     }
   } catch {
     isFallback = true;
   }
 
   const badgeColor = metrics.sev === 'CRITICAL' ? 'red' : metrics.sev === 'WARNING' ? 'yellow' : 'green';
+
+  const latDir = safeLat >= 0 ? 'N' : 'S';
+  const lonDir = safeLon >= 0 ? 'E' : 'W';
+  const coordStr = `${Math.abs(safeLat).toFixed(2)}${latDir} ${Math.abs(safeLon).toFixed(2)}${lonDir}`;
+  const sourceStr = isFallback
+    ? 'OFFLINE CACHE'
+    : isCached
+      ? 'EDGE CACHE (120S)'
+      : 'OPEN-METEO LIVE';
 
   const bodyRows: TeletextSpan[][] = [
     [
@@ -79,8 +102,9 @@ export async function getWeatherPage(): Promise<TeletextFrameResponse> {
       { t: ' ', c: 'blue', b: 'blue' },
     ],
     [
-      { t: 'SOURCE: ', c: 'white' },
-      { t: isFallback ? 'BACKUP METEOROLOGICAL CACHE' : 'OPEN-METEO REALTIME SATELLITE', c: isFallback ? 'yellow' : 'cyan' },
+      { t: 'LOC: ', c: 'yellow' },
+      { t: coordStr.padEnd(16, ' '), c: 'white' },
+      { t: ` ${sourceStr}`.padStart(19, ' '), c: isFallback ? 'yellow' : isCached ? 'cyan' : 'green' },
     ],
     [{ t: '----------------------------------------', c: 'blue' }],
     [

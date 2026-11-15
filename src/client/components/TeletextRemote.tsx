@@ -13,6 +13,8 @@ interface TeletextRemoteProps {
   onToggleHold: () => void;
   onCopyFrame: () => void;
   copied: boolean;
+  onTransmitAfsk: () => void;
+  afskActive: boolean;
   onDigitPress: (digit: string) => void;
   onClear: () => void;
   onSubpageChange: (direction: 'prev' | 'next') => void;
@@ -30,6 +32,8 @@ export const TeletextRemote: React.FC<TeletextRemoteProps> = ({
   onToggleHold,
   onCopyFrame,
   copied,
+  onTransmitAfsk,
+  afskActive,
   onDigitPress,
   onClear,
   onSubpageChange,
@@ -162,6 +166,13 @@ export const TeletextRemote: React.FC<TeletextRemoteProps> = ({
             title="Export raw 40x24 ASCII packet for LoRa, HAM radio, or emergency SMS (Key X)"
           >
             {copied ? 'PACKET COPIED' : 'COPY RADIO PACKET'}
+          </button>
+          <button
+            className={`remote-util-btn btn-afsk ${afskActive ? 'afsk-transmitting' : ''}`}
+            onClick={onTransmitAfsk}
+            title="Broadcast Bell 202 AFSK 1200 baud audio packet via speaker (Key B)"
+          >
+            {afskActive ? 'TX AFSK 1200...' : 'BROADCAST AFSK'}
           </button>
         </div>
 

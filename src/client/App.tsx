@@ -10,7 +10,14 @@ import { getWeatherPage } from '../server/services/weather';
 import { getTransitPage } from '../server/services/transit';
 import { getEmergencyPage } from '../server/services/emergency';
 import { getDiagnosticsPage } from '../server/services/diagnostics';
-import { playDegauss, playKeyClick, playPacketChirp, playRollChirp } from './audio';
+import {
+  AfskTransmission,
+  playDegauss,
+  playKeyClick,
+  playPacketChirp,
+  playRollChirp,
+  transmitBell202Afsk,
+} from './audio';
 import { TeletextHUD } from './components/TeletextHUD';
 import { TeletextRemote } from './components/TeletextRemote';
 import { TeletextScreen } from './components/TeletextScreen';
@@ -19,6 +26,7 @@ import { TeletextScreen } from './components/TeletextScreen';
 export async function resolvePageLocal(
   code: string,
   sub: number,
+  coords?: { lat: number; lon: number } | null,
 ): Promise<TeletextFrameResponse> {
   switch (code) {
     case '100':
@@ -27,7 +35,7 @@ export async function resolvePageLocal(
       return getBulletinPage();
     case '201':
       if (sub === 2) {
-        return await getWeatherPage();
+        return await getWeatherPage(coords?.lat, coords?.lon);
       }
       return await getEarthquakePage();
     case '301':
@@ -56,9 +64,28 @@ export const App: React.FC = () => {
   const [audio, setAudio] = useState<boolean>(true);
   const [hold, setHold] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+  const [afskActive, setAfskActive] = useState<boolean>(false);
+  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
 
   const rollTimerRef = useRef<number | null>(null);
   const irTimerRef = useRef<number | null>(null);
+  const afskRef = useRef<AfskTransmission | null>(null);
+
+  // query browser geolocation silently on start
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setCoords({
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+          });
+        },
+        () => {},
+        { timeout: 4000, maximumAge: 300000 },
+      );
+    }
+  }, []);
 
   // flash infrared transmitter on remote
   const triggerIrFlash = useCallback(() => {
@@ -94,7 +121,8 @@ export const App: React.FC = () => {
 
         let data: TeletextFrameResponse | null = null;
         try {
-          const res = await fetch(`/api/page/${code}?subpage=${sub}`);
+          const coordsQuery = coords ? `&lat=${coords.lat}&lon=${coords.lon}` : '';
+          const res = await fetch(`/api/page/${code}?subpage=${sub}${coordsQuery}`);
           if (res.ok) {
             data = (await res.json()) as TeletextFrameResponse;
           }
@@ -103,7 +131,7 @@ export const App: React.FC = () => {
         }
 
         if (!data) {
-          data = await resolvePageLocal(code, sub);
+          data = await resolvePageLocal(code, sub, coords);
         }
 
         const elapsed = Math.round(performance.now() - startTime);
@@ -129,7 +157,7 @@ export const App: React.FC = () => {
         setSubpage(1);
       }
     },
-    [audio, slow2G, triggerIrFlash],
+    [audio, coords, slow2G, triggerIrFlash],
   );
 
   // navigate to a specific page
@@ -201,6 +229,34 @@ export const App: React.FC = () => {
     window.setTimeout(() => setCopied(false), 2000);
   }, [audio, frame.rows, triggerIrFlash]);
 
+  // broadcast bell 202 afsk 1200 baud modem packet over speaker
+  const handleTransmitAfsk = useCallback(() => {
+    triggerIrFlash();
+    if (afskActive && afskRef.current) {
+      afskRef.current.stop();
+      afskRef.current = null;
+      setAfskActive(false);
+      return;
+    }
+
+    const textSummary = frame.rows
+      .map((r) => r.map((s) => s.t).join(''))
+      .filter((l) => l.trim().length > 0)
+      .slice(0, 6)
+      .join('\n');
+
+    const payload = `P100//PAGE_${frame.code}_S${frame.subpage}\n${textSummary}\n//END`;
+    const transmission = transmitBell202Afsk(payload, audio);
+    if (transmission) {
+      afskRef.current = transmission;
+      setAfskActive(true);
+      window.setTimeout(() => {
+        setAfskActive(false);
+        afskRef.current = null;
+      }, transmission.durationMs);
+    }
+  }, [afskActive, audio, frame.code, frame.rows, frame.subpage, triggerIrFlash]);
+
   // auto-roll subpages every 10 seconds unless HOLD is active
   useEffect(() => {
     if (hold || frame.totalSubpages <= 1) return;
@@ -251,6 +307,9 @@ export const App: React.FC = () => {
       } else if (key === 'X' || key === 'P') {
         e.preventDefault();
         handleCopyPacket();
+      } else if (key === 'B' || key === 'T') {
+        e.preventDefault();
+        handleTransmitAfsk();
       } else if (e.key === 'Escape' || key === 'H') {
         e.preventDefault();
         navigateTo('100');
@@ -270,6 +329,7 @@ export const App: React.FC = () => {
     handleDigit,
     handleSubpageChange,
     handleToggleHold,
+    handleTransmitAfsk,
     navigateTo,
     triggerIrFlash,
   ]);
@@ -295,6 +355,7 @@ export const App: React.FC = () => {
         onToggleAudio={setAudio}
         hold={hold}
         copied={copied}
+        afskActive={afskActive}
       />
 
       <div className="teletext-main-layout">
@@ -318,6 +379,8 @@ export const App: React.FC = () => {
             onToggleHold={handleToggleHold}
             onCopyFrame={handleCopyPacket}
             copied={copied}
+            onTransmitAfsk={handleTransmitAfsk}
+            afskActive={afskActive}
             onDigitPress={handleDigit}
             onClear={() => {
               triggerIrFlash();
@@ -333,7 +396,7 @@ export const App: React.FC = () => {
 
       <footer className="p100-guide">
         <p>
-          Hardware Controls: <kbd>0-9</kbd> Jump Page | <kbd>R</kbd> Red | <kbd>G</kbd> Green | <kbd>Y</kbd> Yellow | <kbd>C</kbd> Cyan | <kbd>&larr;/&rarr;</kbd> Subpage | <kbd>Space</kbd> Hold/Roll | <kbd>X</kbd> Copy Packet | <kbd>Esc</kbd> Index P100
+          Hardware Controls: <kbd>0-9</kbd> Jump Page | <kbd>R</kbd> Red | <kbd>G</kbd> Green | <kbd>Y</kbd> Yellow | <kbd>C</kbd> Cyan | <kbd>&larr;/&rarr;</kbd> Subpage | <kbd>Space</kbd> Hold/Roll | <kbd>X</kbd> Copy Packet | <kbd>B</kbd> Broadcast AFSK | <kbd>Esc</kbd> Index P100
         </p>
         <p style={{ marginTop: '0.4rem', color: '#4a5568' }}>
           Kiroween 2026 Hackathon &bull; Resurrection Category &bull; 1980s CRT Teletext Broadcast Terminal
