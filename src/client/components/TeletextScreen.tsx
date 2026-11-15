@@ -33,29 +33,36 @@ export const TeletextScreen: React.FC<TeletextScreenProps> = ({
     return () => clearInterval(timer);
   }, []);
 
-  // render individual teletext row with normal 40-character span flow
+  // render individual teletext row mapped to full-width 40-column matrix
   const renderRow = (rowSpans: TeletextSpan[], rowIndex: number) => {
-    const charCount = rowSpans.reduce((sum, s) => sum + s.t.length, 0);
-    const padding = charCount < 40 ? ' '.repeat(40 - charCount) : '';
+    // decompose row spans into exactly 40 character cells to guarantee full-width raster
+    const cells: { char: string; fg: string; bg: string; double: boolean }[] = [];
+    for (const span of rowSpans) {
+      const fg = span.c || 'white';
+      const bg = span.b || 'black';
+      const double = Boolean(span.d);
+      for (const ch of span.t) {
+        if (cells.length < 40) {
+          cells.push({ char: ch, fg, bg, double });
+        }
+      }
+    }
+    while (cells.length < 40) {
+      cells.push({ char: ' ', fg: 'white', bg: 'black', double: false });
+    }
 
     return (
       <div key={rowIndex} className="tt-row">
-        {rowSpans.map((span, spanIdx) => {
-          const fgClass = `fg-${span.c || 'white'}`;
-          const bgClass = `bg-${span.b || 'black'}`;
-          const dClass = span.d ? 'double' : '';
-          return (
-            <span
-              key={spanIdx}
-              className={`tt-span ${fgClass} ${bgClass} ${dClass}`}
-            >
-              {span.t}
-            </span>
-          );
-        })}
-        {padding && (
-          <span className="tt-span fg-white bg-black">{padding}</span>
-        )}
+        {cells.map((cell, cellIdx) => (
+          <span
+            key={cellIdx}
+            className={`tt-cell fg-${cell.fg} bg-${cell.bg} ${
+              cell.double ? 'double' : ''
+            }`}
+          >
+            {cell.char}
+          </span>
+        ))}
       </div>
     );
   };
@@ -75,14 +82,13 @@ export const TeletextScreen: React.FC<TeletextScreenProps> = ({
     }
 
     const displayPage = `P${rollingCode.padEnd(4, ' ')}`;
-    return (
-      <div key={0} className="tt-row">
-        <span className="tt-span fg-yellow bg-blue double">{displayPage}</span>
-        <span className="tt-span fg-white bg-blue">
-          {' P100 TUNING BROADCAST... '.padEnd(27, ' ')}
-        </span>
-        <span className="tt-span fg-yellow bg-blue">{'SEARCH  '}</span>
-      </div>
+    return renderRow(
+      [
+        { t: displayPage, c: 'yellow', b: 'blue', d: true },
+        { t: ' P100 TUNING BROADCAST... '.padEnd(27, ' '), c: 'white', b: 'blue' },
+        { t: 'SEARCH  ', c: 'yellow', b: 'blue' },
+      ],
+      0,
     );
   };
 

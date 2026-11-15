@@ -26,7 +26,7 @@ export const TeletextFastext: React.FC<TeletextFastextProps> = ({
         return (
           <button
             key={idx}
-            className={`tt-span fastext-button ${fg} ${bg}`}
+            className={`fastext-button ${fg} ${bg}`}
             onClick={() => onNavigate(item.code)}
             title={`Jump to P${item.code} (Shortcut: ${key})`}
           >
