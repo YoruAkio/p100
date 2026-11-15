@@ -56,11 +56,11 @@ body {
 
 .p100-app {
   width: 100%;
-  max-width: 900px;
+  max-width: 1180px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.2rem 1rem 2rem 1rem;
+  padding: 1.2rem 1.5rem 2.5rem 1.5rem;
 }
 
 /* main horizontal layout: tv on left, remote on right */
@@ -69,9 +69,9 @@ body {
   flex-direction: row;
   align-items: flex-start;
   justify-content: center;
-  gap: 20px;
+  gap: 26px;
   width: 100%;
-  max-width: 780px;
+  max-width: 1060px;
 }
 
 /* remote input column on the right */
@@ -89,7 +89,7 @@ body {
 .retro-rack-hud {
   position: relative;
   width: 100%;
-  max-width: 780px;
+  max-width: 1060px;
   background: linear-gradient(180deg, #262933 0%, #171920 100%);
   border: 2px solid #373c4a;
   border-radius: 6px;
@@ -328,14 +328,14 @@ body {
 }
 
 /* ==========================================================================
-   2. COLOR CRT TELEVISION SET (NORMAL NATIVE SIZE)
+   2. COLOR CRT TELEVISION SET (EXPANDED WIDE 4:3 NATIVE VIEW)
    ========================================================================== */
 
 .crt-tv-chassis {
   position: relative;
   background: linear-gradient(180deg, #2b2e38 0%, #181920 100%);
-  border-radius: 28px;
-  padding: 18px 20px 20px 20px;
+  border-radius: 32px;
+  padding: 20px 24px 20px 24px;
   border: 3px solid #3d4251;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9),
     inset 0 3px 6px rgba(255, 255, 255, 0.12),
@@ -343,18 +343,21 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 1;
+  width: 100%;
+  max-width: 800px;
 }
 
 /* dual rabbit-ear antenna tips in background */
 .tv-antenna-left {
   position: absolute;
   top: -38px;
-  left: 90px;
+  left: calc(50% - 35px);
   width: 6px;
   height: 48px;
   background: linear-gradient(90deg, #959fad 0%, #58606e 100%);
   border-radius: 3px;
-  transform: rotate(-30deg);
+  transform: rotate(-25deg);
   z-index: -1;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
@@ -362,12 +365,12 @@ body {
 .tv-antenna-right {
   position: absolute;
   top: -38px;
-  left: 140px;
+  left: calc(50% + 15px);
   width: 6px;
   height: 48px;
   background: linear-gradient(90deg, #959fad 0%, #58606e 100%);
   border-radius: 3px;
-  transform: rotate(30deg);
+  transform: rotate(25deg);
   z-index: -1;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
@@ -375,12 +378,12 @@ body {
 /* top heat ventilation slats */
 .tv-top-ventilation {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 12px;
 }
 
 .tv-top-ventilation span {
-  width: 32px;
+  width: 36px;
   height: 4px;
   background: #101217;
   border-radius: 2px;
@@ -392,13 +395,14 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 /* deeply recessed crt screen bezel */
 .crt-screen-bezel {
   background: #111318;
-  border-radius: 24px;
-  padding: 12px 16px 10px 16px;
+  border-radius: 26px;
+  padding: 16px 20px 12px 20px;
   box-shadow: inset 0 6px 20px rgba(0, 0, 0, 0.95),
     inset 0 0 3px rgba(255, 255, 255, 0.1),
     0 1px 2px rgba(255, 255, 255, 0.08);
@@ -406,6 +410,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
 .crt-screen-trim {
@@ -414,6 +419,7 @@ body {
   box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.95);
   overflow: hidden;
   position: relative;
+  width: 100%;
 }
 
 /* ==========================================================================
@@ -425,16 +431,17 @@ body {
   background: #000000;
   overflow: hidden;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 /* active 3d spherical convex bulb geometry */
 .crt-glass-tube.convex-active {
-  border-radius: 46px / 32px;
-  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.95),
-    inset 0 0 130px rgba(0, 0, 0, 0.85),
-    inset 0 4px 8px rgba(255, 255, 255, 0.25),
-    0 0 30px rgba(0, 0, 0, 0.9);
-  transform: perspective(750px) scale(0.985);
+  border-radius: 36px / 26px;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.95),
+    inset 0 0 110px rgba(0, 0, 0, 0.85),
+    inset 0 3px 6px rgba(255, 255, 255, 0.22),
+    0 0 25px rgba(0, 0, 0, 0.9);
+  transform: perspective(850px) scale(0.99);
 }
 
 .crt-glass-tube.flat-active {
@@ -518,42 +525,46 @@ body {
   text-shadow: 0 0 1px currentColor, 0 0 4px currentColor;
 }
 
-/* 40x24 teletext grid viewport - normal native 40ch size */
+/* 40x24 teletext grid viewport - expanded wide CRT view */
 .teletext-grid {
   display: grid;
-  grid-template-rows: repeat(24, 1.34em);
-  width: 40ch;
+  grid-template-rows: repeat(24, 1.28em);
+  width: 100%;
   background: #000000;
-  padding: 8px 12px;
-  font-size: 19px;
-  line-height: 1.34em;
+  padding: 16px 24px;
+  font-size: clamp(14px, 1.9vw, 21.5px);
+  line-height: 1.28em;
   font-family: var(--font-teletext);
   font-weight: bold;
   position: relative;
   z-index: 10;
+  box-sizing: border-box;
 }
 
 .teletext-grid.grid-curved {
-  transform: perspective(600px) scale(0.99);
+  transform: perspective(700px) scale(0.995);
 }
 
 .tt-row {
   white-space: pre;
   display: flex;
-  overflow: hidden;
-  height: 1.34em;
-  width: 40ch;
+  align-items: center;
+  overflow: visible;
+  height: 1.28em;
+  width: 100%;
+  letter-spacing: 0.10em;
 }
 
 .tt-span {
   display: inline-block;
   height: 100%;
+  letter-spacing: inherit;
 }
 
 .tt-span.double {
   transform-origin: top left;
   font-weight: 900;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.12em;
 }
 
 /* 8 classic teletext colors */
@@ -576,17 +587,20 @@ body {
 .bg-white { background-color: var(--tt-white); }
 
 .fastext-button {
+  flex: 1;
+  width: 25%;
   cursor: pointer;
   border: none;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
   font-weight: bold;
+  letter-spacing: inherit;
   text-align: left;
-  padding: 0;
+  padding: 0 4px;
   outline: none;
-  width: 10ch;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   transition: filter 0.08s;
 }
 
@@ -925,7 +939,7 @@ body {
   font-size: 0.8rem;
   color: #798397;
   text-align: center;
-  max-width: 900px;
+  max-width: 1060px;
   line-height: 1.6;
 }
 
@@ -938,13 +952,18 @@ body {
   font-weight: bold;
 }
 
-@media (max-width: 780px) {
+@media (max-width: 900px) {
   .teletext-main-layout {
     flex-direction: column;
     align-items: center;
   }
   .remote-column {
     position: static;
+    width: 100%;
+    max-width: 480px;
+  }
+  .crt-tv-chassis {
+    max-width: 100%;
   }
 }
 
@@ -956,10 +975,18 @@ body {
     flex-wrap: wrap;
   }
   .teletext-grid {
-    font-size: 12px;
-    padding: 6px 10px;
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+  .tt-row {
+    letter-spacing: 0.04em;
   }
   .crt-tv-chassis {
-    padding: 12px 10px;
+    padding: 14px 14px;
+    border-radius: 20px;
+  }
+  .crt-screen-bezel {
+    padding: 10px 10px 8px 10px;
+    border-radius: 16px;
   }
 }
