@@ -18,6 +18,7 @@ P100 is an ultra-low-bandwidth, high-resilience crisis communication and transit
 | Page Code | Title | Description |
 |-----------|-------|-------------|
 | **P100** | Master Index & Broadcast Clock | Channel directory, live transmission status, and navigation shortcuts. |
+| **P102** | Civil Defense Crisis Bulletins | Emergency public directives, evacuation routes, and rationing logistics. |
 | **P201 (1/2)** | Global Seismic Monitor | Real-time USGS 4.5+ Day earthquake feed sorted severity-first. |
 | **P201 (2/2)** | Meteorological Severe Radar | Live Open-Meteo weather parameters and severe weather advisories. |
 | **P301** | Metro & Regional Transit Board | Multi-line railway dispatch status (`ON TIME`, `DELAYED`, `SUSPENDED`). |
@@ -35,9 +36,10 @@ P100 is an ultra-low-bandwidth, high-resilience crisis communication and transit
   - `G` or `g`: Green link
   - `Y` or `y`: Yellow link
   - `C` or `c`: Cyan link
-- **Subpage Carousel:** Press `Left Arrow` or `Right Arrow` (or click `< PREV` / `NEXT >` on the remote) to cycle through multi-page feeds like P201.
+- **Subpage Carousel & Hold:** Auto-rotates multi-subpage broadcasts (every 10s). Press `Space` or `O` (or click `HOLD` / `ROLL` on the remote) to toggle auto-roll lock. Press `Left Arrow` or `Right Arrow` for manual stepping.
+- **LoRa & HAM Radio Packet Export:** Press `X` or `P` (or click `COPY RADIO PACKET` on the remote) to export the raw 40x24 ASCII frame to clipboard for packet radio / SMS gateways.
 - **Reset:** Press `Esc` or `H` to return to Master Index P100.
-- **HUD Toggles:** Toggle CRT scanlines, phosphor glow, or Slow-2G simulation mode (2,500ms delay) in the top header.
+- **HUD Toggles:** Toggle CRT scanlines, phosphor glow, 3D convex curvature, 1980s Web Audio synthesized sound FX, or Slow-2G simulation mode (2,500ms delay) in the top rack-mount header.
 
 ---
 

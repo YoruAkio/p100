@@ -8,6 +8,7 @@ import { getDiagnosticsPage } from './services/diagnostics';
 import { getEarthquakePage } from './services/earthquake';
 import { getEmergencyPage } from './services/emergency';
 import { getIndexPage } from './services/indexPage';
+import { getBulletinPage } from './services/bulletin';
 import { getTransitPage } from './services/transit';
 import { getWeatherPage } from './services/weather';
 
@@ -50,6 +51,10 @@ app.get('/api/page/:code', async (c) => {
       frame = getIndexPage();
       break;
 
+    case '102':
+      frame = getBulletinPage();
+      break;
+
     case '201':
       if (subpage === 2) {
         frame = await getWeatherPage();
@@ -79,8 +84,14 @@ app.get('/api/page/:code', async (c) => {
   const budget = checkByteBudget(frame);
   frame.bytes = budget.bytes;
 
+  const cacheControl =
+    code === '201'
+      ? 'public, max-age=15, s-maxage=30, stale-while-revalidate=60'
+      : 'public, max-age=300, s-maxage=600';
+
   return c.json(frame, 200, {
     'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': cacheControl,
     'X-Teletext-Page': frame.code,
     'X-Teletext-Bytes': String(frame.bytes),
     'X-Teletext-Grid': '40x24',

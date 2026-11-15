@@ -14,6 +14,7 @@ import { generatePage404 } from '../src/teletext/page404';
 import { sanitizeTeletextString } from '../src/teletext/sanitizer';
 import { FastextNav, TeletextColor, TeletextSpan } from '../src/teletext/types';
 import { checkByteBudget, isValidPageCode } from '../src/teletext/validator';
+import { getBulletinPage } from '../src/server/services/bulletin';
 import { getDiagnosticsPage } from '../src/server/services/diagnostics';
 import { getEarthquakePage } from '../src/server/services/earthquake';
 import { getEmergencyPage } from '../src/server/services/emergency';
@@ -165,8 +166,11 @@ describe('Teletext Core Property-Based Tests (PBT)', () => {
 
   it('invariant 6: all production channels satisfy strict 40x24 and sub-2KB constraints', async () => {
     const p100 = getIndexPage();
-    const p201_1 = await getEarthquakePage();
-    const p201_2 = await getWeatherPage();
+    const p102 = getBulletinPage();
+    const [p201_1, p201_2] = await Promise.all([
+      getEarthquakePage(),
+      getWeatherPage(),
+    ]);
     const p301 = getTransitPage();
     const p401 = getEmergencyPage();
     const p999 = getDiagnosticsPage();
@@ -174,6 +178,7 @@ describe('Teletext Core Property-Based Tests (PBT)', () => {
 
     const allPages = [
       { name: 'P100', page: p100 },
+      { name: 'P102', page: p102 },
       { name: 'P201_1', page: p201_1 },
       { name: 'P201_2', page: p201_2 },
       { name: 'P301', page: p301 },
@@ -202,5 +207,5 @@ describe('Teletext Core Property-Based Tests (PBT)', () => {
         `${name} byte size ${budget.bytes} must be < 2048`,
       ).toBe(true);
     }
-  });
+  }, 15000);
 });

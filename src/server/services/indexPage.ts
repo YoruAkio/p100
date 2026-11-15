@@ -26,6 +26,10 @@ export function getIndexPage(): TeletextFrameResponse {
       { t: ' MAIN INDEX & SYSTEM CLOCK', c: 'white' },
     ],
     [
+      { t: ' P102 ', c: 'black', b: 'yellow' },
+      { t: ' CRISIS BULLETINS & DIRECTIVES', c: 'white' },
+    ],
+    [
       { t: ' P201 ', c: 'black', b: 'yellow' },
       { t: ' SEISMIC ALERTS (USGS LIVE 4.5+)', c: 'red' },
     ],

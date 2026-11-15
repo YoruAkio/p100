@@ -1,6 +1,6 @@
 // authentic 1980s color crt television set component
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TeletextFrameResponse, TeletextSpan } from '../../teletext/types';
 import { TeletextFastext } from './TeletextFastext';
 
@@ -21,6 +21,18 @@ export const TeletextScreen: React.FC<TeletextScreenProps> = ({
   glow,
   convex,
 }) => {
+  const [liveClock, setLiveClock] = useState<string>(() =>
+    new Date().toTimeString().slice(0, 8),
+  );
+
+  // keep broadcast header clock live every second
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setLiveClock(new Date().toTimeString().slice(0, 8));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   // render individual teletext row with normal 40-character span flow
   const renderRow = (rowSpans: TeletextSpan[], rowIndex: number) => {
     const charCount = rowSpans.reduce((sum, s) => sum + s.t.length, 0);
@@ -52,7 +64,14 @@ export const TeletextScreen: React.FC<TeletextScreenProps> = ({
   const renderHeader = () => {
     const firstRow = frame.rows[0] || [];
     if (!rollingCode) {
-      return renderRow(firstRow, 0);
+      // replace static header time with real-time broadcast clock
+      const liveRow = firstRow.map((span, idx) => {
+        if (idx === firstRow.length - 1 && span.t.length >= 8) {
+          return { ...span, t: liveClock };
+        }
+        return span;
+      });
+      return renderRow(liveRow, 0);
     }
 
     const displayPage = `P${rollingCode.padEnd(4, ' ')}`;
@@ -67,8 +86,19 @@ export const TeletextScreen: React.FC<TeletextScreenProps> = ({
     );
   };
 
+  // accessible summary for screen readers
+  const plainTextSummary = frame.rows
+    .map((r) => r.map((s) => s.t).join(''))
+    .filter((line) => line.trim().length > 0)
+    .join(' ');
+
   return (
     <div className="crt-tv-chassis">
+      {/* accessible screen reader broadcast announcement */}
+      <div className="sr-only" aria-live="polite">
+        P100 Teletext Page {frame.code}, Subpage {frame.subpage} of {frame.totalSubpages}: {frame.title}. {plainTextSummary}
+      </div>
+
       {/* top rabbit-ear antenna silhouette */}
       <div className="tv-antenna-left" aria-hidden="true" />
       <div className="tv-antenna-right" aria-hidden="true" />

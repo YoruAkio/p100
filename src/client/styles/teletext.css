@@ -41,6 +41,19 @@ body {
   user-select: none;
 }
 
+/* screen reader accessible hidden text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 .p100-app {
   width: 100%;
   max-width: 900px;
@@ -754,8 +767,8 @@ body {
 /* subpage carousel rocker buttons */
 .remote-subpage-rocker {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 6px;
 }
 
 .rocker-btn {
@@ -763,18 +776,31 @@ body {
   color: #e5e9f0;
   border: 1px solid #434c5e;
   border-radius: 6px;
-  padding: 8px 4px;
+  padding: 8px 3px;
   font-family: var(--font-teletext);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: bold;
   cursor: pointer;
   box-shadow: 0 3px 0 rgba(0, 0, 0, 0.6);
   transition: transform 0.05s;
+  text-align: center;
 }
 
 .rocker-btn:active {
   transform: translateY(2px);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.btn-hold {
+  color: #f1c40f;
+  border-color: #53451b;
+}
+
+.btn-hold.hold-active {
+  background: #f39c12;
+  color: #000000;
+  border-color: #f1c40f;
+  box-shadow: 0 0 8px rgba(243, 156, 18, 0.7);
 }
 
 /* tactile numpad matrix */
@@ -815,6 +841,47 @@ body {
 .numpad-key.key-idx {
   color: #f1c40f;
   font-size: 0.8rem;
+}
+
+/* disaster radio packet export */
+.remote-utility-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.remote-util-btn {
+  background: #232834;
+  color: #00ffff;
+  border: 1px solid #3c495f;
+  border-radius: 6px;
+  padding: 8px 4px;
+  font-family: var(--font-teletext);
+  font-size: 0.64rem;
+  font-weight: bold;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.6);
+  transition: all 0.1s ease;
+  text-align: center;
+}
+
+.remote-util-btn:hover {
+  background: #2c3342;
+  color: #ffffff;
+}
+
+.remote-util-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.remote-util-btn.btn-copied {
+  background: #2ecc71;
+  color: #000000;
+  border-color: #27ae60;
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.8);
 }
 
 .remote-bottom-badge {

@@ -14,6 +14,10 @@ interface TeletextHUDProps {
   onToggleGlow: (enabled: boolean) => void;
   convex: boolean;
   onToggleConvex: (enabled: boolean) => void;
+  audio: boolean;
+  onToggleAudio: (enabled: boolean) => void;
+  hold: boolean;
+  copied: boolean;
 }
 
 export const TeletextHUD: React.FC<TeletextHUDProps> = ({
@@ -28,6 +32,10 @@ export const TeletextHUD: React.FC<TeletextHUDProps> = ({
   onToggleGlow,
   convex,
   onToggleConvex,
+  audio,
+  onToggleAudio,
+  hold,
+  copied,
 }) => {
   const isBudgetOk = bytes < 2048;
 
@@ -73,6 +81,14 @@ export const TeletextHUD: React.FC<TeletextHUDProps> = ({
             }`}
           >
             <span className="led-digits">{source.toUpperCase()}</span>
+          </div>
+        </div>
+
+        {/* subpage mode indicator */}
+        <div className="led-readout-panel">
+          <span className="led-label">SUBPAGE FEED</span>
+          <div className={`led-display ${hold ? 'led-amber' : 'led-green'}`}>
+            <span className="led-digits">{hold ? 'HOLD' : 'AUTO-ROLL'}</span>
           </div>
         </div>
 
@@ -134,6 +150,16 @@ export const TeletextHUD: React.FC<TeletextHUDProps> = ({
           />
           <span className="toggle-switch-lever" />
           <span className="toggle-switch-label">CONVEX TV</span>
+        </label>
+
+        <label className="toggle-switch-wrapper" title="Toggle 1980s Synthesized Audio Effects">
+          <input
+            type="checkbox"
+            checked={audio}
+            onChange={(e) => onToggleAudio(e.target.checked)}
+          />
+          <span className="toggle-switch-lever" />
+          <span className="toggle-switch-label">AUDIO FX</span>
         </label>
       </div>
     </header>

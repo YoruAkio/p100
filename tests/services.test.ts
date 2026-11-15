@@ -2,6 +2,7 @@
 
 import { describe, expect, it } from 'vitest';
 import app from '../src/server/index';
+import { getBulletinPage } from '../src/server/services/bulletin';
 import { getDiagnosticsPage } from '../src/server/services/diagnostics';
 import { getEarthquakePage } from '../src/server/services/earthquake';
 import { getEmergencyPage } from '../src/server/services/emergency';
@@ -47,6 +48,14 @@ describe('Teletext Edge Services', () => {
     expect(page.rows.length).toBe(24);
   });
 
+  it('returns civil defense crisis bulletins page 102', () => {
+    const page = getBulletinPage();
+    expect(page.code).toBe('102');
+    expect(page.title).toBe('CRISIS BULLETINS');
+    expect(page.rows.length).toBe(24);
+    expect(page.bytes).toBeLessThan(2048);
+  });
+
   it('returns diagnostics page 999 with telemetry', () => {
     const page = getDiagnosticsPage();
     expect(page.code).toBe('999');
@@ -74,6 +83,21 @@ describe('Hono Edge Router Endpoints', () => {
     const data = (await res.json()) as TeletextFrameResponse;
     expect(data.code).toBe('100');
     expect(data.rows.length).toBe(24);
+  });
+
+  it('handles GET /api/page/102 and returns crisis bulletins with cache header', async () => {
+    const res = await app.request('/api/page/102');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Cache-Control')).toContain('max-age=300');
+    const data = (await res.json()) as TeletextFrameResponse;
+    expect(data.code).toBe('102');
+    expect(data.rows.length).toBe(24);
+  });
+
+  it('sets short cache-control header on dynamic page 201', async () => {
+    const res = await app.request('/api/page/201');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Cache-Control')).toContain('max-age=15');
   });
 
   it('handles subpage queries for page 201', async () => {

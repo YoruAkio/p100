@@ -4,11 +4,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { generatePage404 } from '../teletext/page404';
 import { TeletextFrameResponse } from '../teletext/types';
 import { getIndexPage } from '../server/services/indexPage';
+import { getBulletinPage } from '../server/services/bulletin';
 import { getEarthquakePage } from '../server/services/earthquake';
 import { getWeatherPage } from '../server/services/weather';
 import { getTransitPage } from '../server/services/transit';
 import { getEmergencyPage } from '../server/services/emergency';
 import { getDiagnosticsPage } from '../server/services/diagnostics';
+import { playDegauss, playKeyClick, playPacketChirp, playRollChirp } from './audio';
 import { TeletextHUD } from './components/TeletextHUD';
 import { TeletextRemote } from './components/TeletextRemote';
 import { TeletextScreen } from './components/TeletextScreen';
@@ -21,6 +23,8 @@ export async function resolvePageLocal(
   switch (code) {
     case '100':
       return getIndexPage();
+    case '102':
+      return getBulletinPage();
     case '201':
       if (sub === 2) {
         return await getWeatherPage();
@@ -49,6 +53,9 @@ export const App: React.FC = () => {
   const [glow, setGlow] = useState<boolean>(true);
   const [convex, setConvex] = useState<boolean>(true);
   const [irBlink, setIrBlink] = useState<boolean>(false);
+  const [audio, setAudio] = useState<boolean>(true);
+  const [hold, setHold] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
 
   const rollTimerRef = useRef<number | null>(null);
   const irTimerRef = useRef<number | null>(null);
@@ -66,6 +73,7 @@ export const App: React.FC = () => {
   const fetchPage = useCallback(
     async (code: string, sub: number) => {
       triggerIrFlash();
+      playRollChirp(audio);
       const startTime = performance.now();
 
       // trigger teletext header roll animation
@@ -121,7 +129,7 @@ export const App: React.FC = () => {
         setSubpage(1);
       }
     },
-    [slow2G, triggerIrFlash],
+    [audio, slow2G, triggerIrFlash],
   );
 
   // navigate to a specific page
@@ -137,6 +145,7 @@ export const App: React.FC = () => {
   const handleDigit = useCallback(
     (digit: string) => {
       triggerIrFlash();
+      playKeyClick(audio);
       const next = `${inputBuffer}${digit}`;
       if (next.length === 3) {
         setInputBuffer('');
@@ -145,13 +154,14 @@ export const App: React.FC = () => {
         setInputBuffer(next);
       }
     },
-    [inputBuffer, navigateTo, triggerIrFlash],
+    [audio, inputBuffer, navigateTo, triggerIrFlash],
   );
 
   // handle subpage change
   const handleSubpageChange = useCallback(
     (direction: 'prev' | 'next') => {
       triggerIrFlash();
+      playKeyClick(audio);
       if (frame.totalSubpages <= 1) return;
       let nextSub = subpage;
       if (direction === 'prev') {
@@ -161,8 +171,45 @@ export const App: React.FC = () => {
       }
       fetchPage(currentPage, nextSub);
     },
-    [currentPage, fetchPage, frame.totalSubpages, subpage, triggerIrFlash],
+    [audio, currentPage, fetchPage, frame.totalSubpages, subpage, triggerIrFlash],
   );
+
+  // toggle subpage auto-roll / hold
+  const handleToggleHold = useCallback(() => {
+    triggerIrFlash();
+    playKeyClick(audio);
+    setHold((prev) => !prev);
+  }, [audio, triggerIrFlash]);
+
+  // export active frame as raw 40x24 ascii packet for lora/ham radio/sms
+  const handleCopyPacket = useCallback(() => {
+    triggerIrFlash();
+    playPacketChirp(audio);
+    const packet = frame.rows
+      .map((row) =>
+        row
+          .map((s) => s.t)
+          .join('')
+          .padEnd(40, ' '),
+      )
+      .join('\n');
+
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(packet).catch(() => {});
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  }, [audio, frame.rows, triggerIrFlash]);
+
+  // auto-roll subpages every 10 seconds unless HOLD is active
+  useEffect(() => {
+    if (hold || frame.totalSubpages <= 1) return;
+    const timer = window.setInterval(() => {
+      const nextSub = subpage < frame.totalSubpages ? subpage + 1 : 1;
+      fetchPage(currentPage, nextSub);
+    }, 10000);
+    return () => clearInterval(timer);
+  }, [currentPage, fetchPage, frame.totalSubpages, hold, subpage]);
 
   // listen to global keyboard shortcuts
   useEffect(() => {
@@ -198,18 +245,34 @@ export const App: React.FC = () => {
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
         handleSubpageChange('next');
+      } else if (e.key === ' ' || key === 'O') {
+        e.preventDefault();
+        handleToggleHold();
+      } else if (key === 'X' || key === 'P') {
+        e.preventDefault();
+        handleCopyPacket();
       } else if (e.key === 'Escape' || key === 'H') {
         e.preventDefault();
         navigateTo('100');
       } else if (e.key === 'Backspace') {
         triggerIrFlash();
+        playKeyClick(audio);
         setInputBuffer((prev) => prev.slice(0, -1));
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [frame.fastext, handleDigit, handleSubpageChange, navigateTo, triggerIrFlash]);
+  }, [
+    audio,
+    frame.fastext,
+    handleCopyPacket,
+    handleDigit,
+    handleSubpageChange,
+    handleToggleHold,
+    navigateTo,
+    triggerIrFlash,
+  ]);
 
   return (
     <div className="p100-app">
@@ -224,7 +287,14 @@ export const App: React.FC = () => {
         glow={glow}
         onToggleGlow={setGlow}
         convex={convex}
-        onToggleConvex={setConvex}
+        onToggleConvex={(val) => {
+          playDegauss(audio);
+          setConvex(val);
+        }}
+        audio={audio}
+        onToggleAudio={setAudio}
+        hold={hold}
+        copied={copied}
       />
 
       <div className="teletext-main-layout">
@@ -244,9 +314,14 @@ export const App: React.FC = () => {
             subpage={subpage}
             totalSubpages={frame.totalSubpages}
             fastext={frame.fastext}
+            hold={hold}
+            onToggleHold={handleToggleHold}
+            onCopyFrame={handleCopyPacket}
+            copied={copied}
             onDigitPress={handleDigit}
             onClear={() => {
               triggerIrFlash();
+              playKeyClick(audio);
               setInputBuffer('');
             }}
             onSubpageChange={handleSubpageChange}
@@ -258,7 +333,7 @@ export const App: React.FC = () => {
 
       <footer className="p100-guide">
         <p>
-          Hardware Controls: <kbd>0-9</kbd> Jump Page | <kbd>R</kbd> Red | <kbd>G</kbd> Green | <kbd>Y</kbd> Yellow | <kbd>C</kbd> Cyan | <kbd>&larr;/&rarr;</kbd> Subpage | <kbd>Esc</kbd> Index P100
+          Hardware Controls: <kbd>0-9</kbd> Jump Page | <kbd>R</kbd> Red | <kbd>G</kbd> Green | <kbd>Y</kbd> Yellow | <kbd>C</kbd> Cyan | <kbd>&larr;/&rarr;</kbd> Subpage | <kbd>Space</kbd> Hold/Roll | <kbd>X</kbd> Copy Packet | <kbd>Esc</kbd> Index P100
         </p>
         <p style={{ marginTop: '0.4rem', color: '#4a5568' }}>
           Kiroween 2026 Hackathon &bull; Resurrection Category &bull; 1980s CRT Teletext Broadcast Terminal

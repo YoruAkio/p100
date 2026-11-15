@@ -9,6 +9,10 @@ interface TeletextRemoteProps {
   subpage: number;
   totalSubpages: number;
   fastext: FastextNav;
+  hold: boolean;
+  onToggleHold: () => void;
+  onCopyFrame: () => void;
+  copied: boolean;
   onDigitPress: (digit: string) => void;
   onClear: () => void;
   onSubpageChange: (direction: 'prev' | 'next') => void;
@@ -22,6 +26,10 @@ export const TeletextRemote: React.FC<TeletextRemoteProps> = ({
   subpage,
   totalSubpages,
   fastext,
+  hold,
+  onToggleHold,
+  onCopyFrame,
+  copied,
   onDigitPress,
   onClear,
   onSubpageChange,
@@ -46,7 +54,7 @@ export const TeletextRemote: React.FC<TeletextRemoteProps> = ({
           <div className="lcd-header">PAGE MEMORY</div>
           <div className="lcd-digits">{displayBuffer}</div>
           <div className="lcd-sub-info">
-            SUB {subpage}/{totalSubpages}
+            SUB {subpage}/{totalSubpages} {hold ? '[HOLD]' : '[ROLL]'}
           </div>
         </div>
 
@@ -87,21 +95,28 @@ export const TeletextRemote: React.FC<TeletextRemoteProps> = ({
           </button>
         </div>
 
-        {/* subpage carousel rocker */}
+        {/* subpage carousel rocker & hold toggle */}
         <div className="remote-subpage-rocker">
           <button
             className="rocker-btn"
             onClick={() => onSubpageChange('prev')}
             title="Previous Subpage (Arrow Left)"
           >
-            &lt; SUBPAGE
+            &lt; SUB
+          </button>
+          <button
+            className={`rocker-btn btn-hold ${hold ? 'hold-active' : ''}`}
+            onClick={onToggleHold}
+            title="Toggle Subpage Auto-Roll / Hold (Space key)"
+          >
+            {hold ? 'HOLD' : 'ROLL'}
           </button>
           <button
             className="rocker-btn"
             onClick={() => onSubpageChange('next')}
             title="Next Subpage (Arrow Right)"
           >
-            SUBPAGE &gt;
+            SUB &gt;
           </button>
         </div>
 
@@ -136,6 +151,17 @@ export const TeletextRemote: React.FC<TeletextRemoteProps> = ({
             title="Master Index P100"
           >
             IDX
+          </button>
+        </div>
+
+        {/* disaster radio packet export */}
+        <div className="remote-utility-actions">
+          <button
+            className={`remote-util-btn ${copied ? 'btn-copied' : ''}`}
+            onClick={onCopyFrame}
+            title="Export raw 40x24 ASCII packet for LoRa, HAM radio, or emergency SMS (Key X)"
+          >
+            {copied ? 'PACKET COPIED' : 'COPY RADIO PACKET'}
           </button>
         </div>
 
